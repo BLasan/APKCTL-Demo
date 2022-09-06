@@ -18,8 +18,8 @@
 package cmd
 
 import (
+	"github.com/BLasan/APKCTL-Demo/utils"
 	"github.com/spf13/cobra"
-	"github.com/wso2/APKCTL/utils"
 )
 
 const CreateCmdLiteral = "create"

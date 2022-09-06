@@ -18,9 +18,17 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/BLasan/APKCTL-Demo/impl"
+	"github.com/BLasan/APKCTL-Demo/utils"
 	"github.com/spf13/cobra"
-	"github.com/wso2/APKCTL/utils"
 )
+
+var dpNamespace string
+var serviceUrl string
+var file string
+var isDryRun bool
 
 const CreateAPICmdLiteral = "api"
 const CreateAPICmdShortDesc = "Create API and Deploy"
@@ -31,7 +39,6 @@ const createAPICmdExamples = utils.ProjectName + ` ` + CreateCmdLiteral + ` ` + 
   
   ` + utils.ProjectName + ` ` + CreateCmdLiteral + ` ` + CreateCmdLiteral + CreateAPICmdLiteral + ` petstore \
   -f ./swagger.yaml --namespace wso2
-  
 `
 
 // CreateApiCmd represents the create API command
@@ -40,8 +47,20 @@ var CreateApiCmd = &cobra.Command{
 	Short:   CreateAPICmdShortDesc,
 	Long:    CreateCAPImdLongDesc,
 	Example: createAPICmdExamples,
+	Run: func(cmd *cobra.Command, args []string) {
+		handleCreateApi()
+		fmt.Println("Is dry run: ", isDryRun)
+	},
+}
+
+func handleCreateApi() {
+	impl.CreateAPI(file, dpNamespace, serviceUrl)
 }
 
 func init() {
 	CreateCmd.AddCommand(CreateApiCmd)
+	CreateApiCmd.Flags().StringVarP(&dpNamespace, "namespace", "n", "", "Namespace of the API")
+	CreateApiCmd.Flags().StringVar(&serviceUrl, "service-url", "", "Backend Service URL")
+	CreateApiCmd.Flags().StringVar(&file, "f", "", "Path to swagger/OAS definition/GraphQL SDL/WSDL")
+	CreateApiCmd.Flags().BoolVar(&isDryRun, "dry-run", true, "Generate configuration files")
 }
