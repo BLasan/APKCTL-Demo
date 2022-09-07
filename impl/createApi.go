@@ -19,20 +19,42 @@
 package impl
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 
-	"github.com/wso2/APKCTL/utils"
+	"github.com/BLasan/APKCTL-Demo/utils"
+	"github.com/go-openapi/spec"
 )
 
-func CreateAPI(path, namespace, serviceUrl string) {
+func CreateAPI(filePath, namespace, serviceUrl string) error {
+	fmt.Println(filePath)
+	_, content, err := resolveYamlOrJSON(filePath)
+	// fmt.Println("Content: ", string(content))
+
+	if err != nil {
+		fmt.Println("Error: ", err)
+		return err
+	}
+
+	var swaggerSpec spec.Swagger
+	err = json.Unmarshal(content, &swaggerSpec)
+
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	fmt.Println("Swagger Spec: ", swaggerSpec)
+
+	return nil
 
 }
 
 func resolveYamlOrJSON(filename string) (string, []byte, error) {
 	// lookup for yaml
-	yamlFp := filename + ".yaml"
+	yamlFp := filename
 	if info, err := os.Stat(yamlFp); err == nil && !info.IsDir() {
 		// utils.Logln(utils.LogPrefixInfo+"Loading", yamlFp)
 		// read it
@@ -51,7 +73,7 @@ func resolveYamlOrJSON(filename string) (string, []byte, error) {
 
 	jsonFp := filename + ".json"
 	if info, err := os.Stat(jsonFp); err == nil && !info.IsDir() {
-		utils.Logln(utils.LogPrefixInfo+"Loading", jsonFp)
+		// utils.Logln(utils.LogPrefixInfo+"Loading", jsonFp)
 		// read it
 		fn := jsonFp
 		jsonContent, err := ioutil.ReadFile(fn)

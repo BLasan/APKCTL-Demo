@@ -42,6 +42,6 @@ var CreateCmd = &cobra.Command{
 	Example: createCmdExamples,
 }
 
-func init() {
-	RootCmd.AddCommand(CreateCmd)
-}
+// func init() {
+// 	RootCmd.AddCommand(CreateCmd)
+// }
