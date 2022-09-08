@@ -63,6 +63,6 @@ func init() {
 	CreateCmd.AddCommand(CreateApiCmd)
 	CreateApiCmd.Flags().StringVarP(&dpNamespace, "namespace", "n", "", "Namespace of the API")
 	CreateApiCmd.Flags().StringVar(&serviceUrl, "service-url", "", "Backend Service URL")
-	CreateApiCmd.Flags().StringVar(&file, "f", "", "Path to swagger/OAS definition/GraphQL SDL/WSDL")
+	CreateApiCmd.Flags().StringVarP(&file, "file", "f", "", "Path to swagger/OAS definition/GraphQL SDL/WSDL")
 	CreateApiCmd.Flags().BoolVar(&isDryRun, "dry-run", false, "Generate configuration files")
 }
