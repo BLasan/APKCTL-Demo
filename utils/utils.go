@@ -18,19 +18,6 @@
 
 package utils
 
-import (
-	"os"
-)
-
-const ProjectName = "apkctl"
-
-// File Names and Paths
-var CurrentDir, _ = os.Getwd()
-
-const ConfigDirName = ".wso2apictl"
-
-const HttpRouteApiVersion = "gateway.networking.k8s.io/v1beta1"
-
-const HttpRouteKind = "HTTPRoute"
-
-const PathPrefix = "PathPrefix"
+func GetAPKCTLHomeDir() string {
+	return "/Users/benura/Desktop/APKCTL"
+}

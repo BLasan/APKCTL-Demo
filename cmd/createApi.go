@@ -48,13 +48,15 @@ var CreateApiCmd = &cobra.Command{
 	Long:    CreateCAPImdLongDesc,
 	Example: createAPICmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
-		handleCreateApi()
+		// fmt.Println("API Name: ", args[0])
+		apiName := args[0]
 		fmt.Println("Is dry run: ", isDryRun)
+		handleCreateApi(apiName)
 	},
 }
 
-func handleCreateApi() {
-	impl.CreateAPI(file, dpNamespace, serviceUrl)
+func handleCreateApi(apiName string) {
+	impl.CreateAPI(file, dpNamespace, serviceUrl, apiName, isDryRun)
 }
 
 func init() {
@@ -62,5 +64,5 @@ func init() {
 	CreateApiCmd.Flags().StringVarP(&dpNamespace, "namespace", "n", "", "Namespace of the API")
 	CreateApiCmd.Flags().StringVar(&serviceUrl, "service-url", "", "Backend Service URL")
 	CreateApiCmd.Flags().StringVar(&file, "f", "", "Path to swagger/OAS definition/GraphQL SDL/WSDL")
-	CreateApiCmd.Flags().BoolVar(&isDryRun, "dry-run", true, "Generate configuration files")
+	CreateApiCmd.Flags().BoolVar(&isDryRun, "dry-run", false, "Generate configuration files")
 }

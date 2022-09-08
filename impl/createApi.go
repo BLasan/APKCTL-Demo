@@ -23,12 +23,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
+	"strings"
 
+	"github.com/BLasan/APKCTL-Demo/k8s"
 	"github.com/BLasan/APKCTL-Demo/utils"
 	"github.com/go-openapi/spec"
+	"gopkg.in/yaml.v2"
 )
 
-func CreateAPI(filePath, namespace, serviceUrl string) error {
+func CreateAPI(filePath, namespace, serviceUrl, apiName string, isDryRun bool) error {
 	fmt.Println(filePath)
 	_, content, err := resolveYamlOrJSON(filePath)
 	// fmt.Println("Content: ", string(content))
@@ -46,7 +50,75 @@ func CreateAPI(filePath, namespace, serviceUrl string) error {
 		return err
 	}
 
-	fmt.Println("Swagger Spec: ", swaggerSpec)
+	// fmt.Println("Swagger Spec: ", swaggerSpec.Paths.Paths)
+
+	httpRoute := utils.HTTPRouteConfig{}
+	var parentRef utils.ParentRef
+
+	httpRoute.ApiVersion = utils.HttpRouteApiVersion
+	httpRoute.Kind = utils.HttpRouteKind
+	httpRoute.HttpRouteSpec.HostNames = []string{swaggerSpec.Host}
+	parentRef.Name = "parentRef"
+	httpRoute.HttpRouteSpec.ParentRefs = append(httpRoute.HttpRouteSpec.ParentRefs, parentRef)
+	httpRoute.MetaData.Name = "wso2"
+
+	var apiPath utils.Path
+	var match utils.Match
+	var rule utils.Rule
+	var backendRef utils.BackendRef
+
+	var serviceUrlArr []string
+
+	if serviceUrl != "" {
+		serviceUrlArr = strings.Split(serviceUrl, ".")
+	} else if swaggerSpec.Host != "" {
+		serviceUrlArr = strings.Split(swaggerSpec.Host, ".")
+	}
+
+	fmt.Println(serviceUrlArr)
+
+	for path, pathItem := range swaggerSpec.Paths.Paths {
+		apiPath.Type = utils.PathPrefix
+		apiPath.Value = path
+		match.Path = apiPath
+		rule.Matches = append(rule.Matches, match)
+
+		fmt.Println("Path: ", path)
+		if pathItem.Post != nil {
+			fmt.Println("Description Items: ", pathItem.Post.Description)
+		}
+	}
+
+	backendRef.Name = serviceUrlArr[0]
+	backendRef.Port = strings.Split(serviceUrlArr[len(serviceUrlArr)-1], ":")[1]
+	match.BackendRefs = backendRef
+
+	rule.Matches = append(rule.Matches, match)
+
+	httpRoute.HttpRouteSpec.Rules = append(httpRoute.HttpRouteSpec.Rules, rule)
+
+	file, err := yaml.Marshal(&httpRoute)
+
+	if err != nil {
+		return err
+	}
+
+	dirPath := path.Join(utils.GetAPKCTLHomeDir(), apiName)
+
+	os.Mkdir(dirPath, os.ModePerm)
+
+	desFilePath := path.Join(dirPath, "HTTPRouteConfig.yaml")
+
+	// directory location can be defined in the apkctl config file
+	err = ioutil.WriteFile(desFilePath, file, 0644)
+
+	if err != nil {
+		return err
+	}
+
+	if !isDryRun {
+		k8s.ExecuteCommand("apply", "-f "+desFilePath)
+	}
 
 	return nil
 

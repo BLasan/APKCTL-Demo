@@ -9,7 +9,7 @@ info:
   license:
     name: Apache 2.0
     url: http://www.apache.org/licenses/LICENSE-2.0.html
-host: petstore.swagger.io
+host: petstore.wso2.svc.cluster.local:8020
 basePath: /v2
 tags:
  -
@@ -39,7 +39,7 @@ paths:
       tags:
        - pet
       summary: uploads an image
-      description: ""
+      description: "post"
       operationId: uploadFile
       consumes:
        - multipart/form-data

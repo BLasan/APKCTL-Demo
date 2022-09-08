@@ -1,0 +1,59 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: wso2
+spec:
+  parentRefs:
+  - name: parentRef
+  hostnames:
+  - petstore.wso2.svc.cluster.local:8020
+  rules:
+  - matches:
+    - path:
+        type: PathPrefix
+        value: /user/{username}
+    - path:
+        type: PathPrefix
+        value: /pet
+    - path:
+        type: PathPrefix
+        value: /pet/{petId}
+    - path:
+        type: PathPrefix
+        value: /store/inventory
+    - path:
+        type: PathPrefix
+        value: /store/order
+    - path:
+        type: PathPrefix
+        value: /pet/findByStatus
+    - path:
+        type: PathPrefix
+        value: /store/order/{orderId}
+    - path:
+        type: PathPrefix
+        value: /user/logout
+    - path:
+        type: PathPrefix
+        value: /user
+    - path:
+        type: PathPrefix
+        value: /user/login
+    - path:
+        type: PathPrefix
+        value: /pet/{petId}/uploadImage
+    - path:
+        type: PathPrefix
+        value: /user/createWithArray
+    - path:
+        type: PathPrefix
+        value: /user/createWithList
+    - path:
+        type: PathPrefix
+        value: /pet/findByTags
+    - path:
+        type: PathPrefix
+        value: /pet/findByTags
+      backendRefs:
+        name: petstore
+        port: "8020"
