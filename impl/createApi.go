@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 
 	"github.com/BLasan/APKCTL-Demo/k8s"
@@ -57,10 +58,10 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName string, isDryRun bool) e
 
 	httpRoute.ApiVersion = utils.HttpRouteApiVersion
 	httpRoute.Kind = utils.HttpRouteKind
-	httpRoute.HttpRouteSpec.HostNames = []string{swaggerSpec.Host}
-	parentRef.Name = "parentRef"
+	httpRoute.HttpRouteSpec.HostNames = append(httpRoute.HttpRouteSpec.HostNames, "www.example.com")
+	parentRef.Name = "eg"
 	httpRoute.HttpRouteSpec.ParentRefs = append(httpRoute.HttpRouteSpec.ParentRefs, parentRef)
-	httpRoute.MetaData.Name = "wso2"
+	httpRoute.MetaData.Name = "httpbin-wso2"
 
 	var apiPath utils.Path
 	var match utils.Match
@@ -77,25 +78,40 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName string, isDryRun bool) e
 
 	fmt.Println(serviceUrlArr)
 
+	backendRef.Kind = utils.ServiceKind
+
+	counter := 1
+
 	for path, pathItem := range swaggerSpec.Paths.Paths {
+		// maximum 8 paths are allowed
+		if counter > 8 {
+			break
+		}
+
 		apiPath.Type = utils.PathPrefix
 		apiPath.Value = path
 		match.Path = apiPath
+
 		rule.Matches = append(rule.Matches, match)
 
 		fmt.Println("Path: ", path)
 		if pathItem.Post != nil {
 			fmt.Println("Description Items: ", pathItem.Post.Description)
 		}
+
+		counter++
+
 	}
 
 	backendRef.Name = serviceUrlArr[0]
-	backendRef.Port = strings.Split(serviceUrlArr[len(serviceUrlArr)-1], ":")[1]
-	match.BackendRefs = backendRef
+	backendRef.Port, err = strconv.Atoi(strings.Split(serviceUrlArr[len(serviceUrlArr)-1], ":")[1])
 
-	rule.Matches = append(rule.Matches, match)
-
+	rule.BackendRefs = append(rule.BackendRefs, backendRef)
 	httpRoute.HttpRouteSpec.Rules = append(httpRoute.HttpRouteSpec.Rules, rule)
+
+	if err != nil {
+		return err
+	}
 
 	file, err := yaml.Marshal(&httpRoute)
 
@@ -116,8 +132,10 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName string, isDryRun bool) e
 		return err
 	}
 
+	args := []string{"apply", "-f", desFilePath}
+
 	if !isDryRun {
-		k8s.ExecuteCommand("apply", "-f "+desFilePath)
+		k8s.ExecuteCommand("kubectl", args...)
 	}
 
 	return nil

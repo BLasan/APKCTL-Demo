@@ -34,3 +34,5 @@ const HttpRouteApiVersion = "gateway.networking.k8s.io/v1beta1"
 const HttpRouteKind = "HTTPRoute"
 
 const PathPrefix = "PathPrefix"
+
+const ServiceKind = "Service"
