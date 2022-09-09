@@ -16,6 +16,7 @@ func ExecuteCommand(command string, args ...string) error {
 	return cmd.Run()
 }
 
+// setCommandOutAndError sets the output and error of the command cmd to the standard output and error
 func setCommandOutAndError(cmd *exec.Cmd) {
 	var errBuf, outBuf bytes.Buffer
 	cmd.Stderr = io.MultiWriter(os.Stderr, &errBuf)

@@ -36,3 +36,7 @@ const HttpRouteKind = "HTTPRoute"
 const PathPrefix = "PathPrefix"
 
 const ServiceKind = "Service"
+
+// Kubernetes Constants
+const Kubectl = "kubectl"
+const K8sApply = "apply"
