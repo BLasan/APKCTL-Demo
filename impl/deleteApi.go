@@ -19,13 +19,13 @@
 package impl
 
 import (
-	"github.com/BLasan/APKCTL-Demo/k8s"
+	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 	"github.com/BLasan/APKCTL-Demo/utils"
 )
 
 func DeleteAPI(namespace, apiName string) {
-	resource := utils.K8sHttpRoute + "/" + apiName
-	if err := k8s.ExecuteCommand(utils.Kubectl, utils.K8sDelete, resource, "-n", namespace); err != nil {
+	resource := k8sUtils.K8sHttpRoute + "/" + apiName
+	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, resource, "-n", namespace); err != nil {
 		utils.HandleErrorAndExit("Error executing K8s command", err)
 	}
 }

@@ -19,9 +19,11 @@
 package impl
 
 import (
+	"os/exec"
+	"strings"
+
 	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 	"github.com/BLasan/APKCTL-Demo/utils"
-	k8sConstants "github.com/BLasan/APKCTL-Demo/utils"
 )
 
 const gatewayAPICRDsYaml = "https://github.com/envoyproxy/gateway/releases/download/v0.2.0-rc1/gatewayapi-crds.yaml"
@@ -34,20 +36,40 @@ func InstallPlatform() {
 
 	// Envoy Gateway installation (Data Plane profile)
 	// Install the Gateway API CRDs
-	if err := k8sUtils.ExecuteCommand(k8sConstants.Kubectl, k8sConstants.K8sApply, "-f", gatewayAPICRDsYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", gatewayAPICRDsYaml); err != nil {
 		utils.HandleErrorAndExit("Error installing Gateway API CRDs", err)
 	}
 	// Run Envoy Gateway
-	if err := k8sUtils.ExecuteCommand(k8sConstants.Kubectl, k8sConstants.K8sApply, "-f", envoyGatewayInstallYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", envoyGatewayInstallYaml); err != nil {
 		utils.HandleErrorAndExit("Error installing Envoy Gateway", err)
 	}
+
+	// Check pod status of `gateway-api-admission-server` to determine if it is in Running state
+	for {
+		podStatus := getPodStatus()
+		if strings.Trim(podStatus, "\n") == "Running" {
+			break
+		}
+	}
+
 	// Create the GatewayClass
-	if err := k8sUtils.ExecuteCommand(k8sConstants.Kubectl, k8sConstants.K8sApply, "-f", gatewayClassYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", gatewayClassYaml); err != nil {
 		utils.HandleErrorAndExit("Error creating the Gateway Class", err)
 	}
 	// Create the Gateway
-	if err := k8sUtils.ExecuteCommand(k8sConstants.Kubectl, k8sConstants.K8sApply, "-f", gatewayYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", gatewayYaml); err != nil {
 		utils.HandleErrorAndExit("Error creating the Gateway", err)
 	}
 
+}
+
+func getPodStatus() string {
+	podStatus, err := exec.Command(
+		"bash","-c",
+		"kubectl get pods -n gateway-system --no-headers | awk '{if ($1 ~ \"gateway-api-admission-server-\") print $3}'",
+	).Output()
+	if err != nil {
+		utils.HandleErrorAndExit("Error while checking the pod status of a pod that is required for the Envoy Gateway", err)
+	}
+	return string(podStatus)
 }

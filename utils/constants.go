@@ -37,11 +37,4 @@ const PathPrefix = "PathPrefix"
 
 const ServiceKind = "Service"
 
-// Kubernetes Constants
-const Kubectl = "kubectl"
-const K8sApply = "apply"
-
-const K8sDelete = "delete"
-const K8sHttpRoute = "httproute"
-
 const DefaultNamespace = "default"
