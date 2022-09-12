@@ -63,10 +63,16 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	httpRoute.HttpRouteSpec.ParentRefs = append(httpRoute.HttpRouteSpec.ParentRefs, parentRef)
 	httpRoute.MetaData.Name = apiName
 
+	labels := make(map[string]string)
+
+	fmt.Println(version)
+
 	if version == "" {
-		httpRoute.MetaData.Version = swaggerSpec.Info.Version
+		labels["version"] = swaggerSpec.Info.Version
+		httpRoute.MetaData.Labels = labels
 	} else {
-		httpRoute.MetaData.Version = version
+		labels["version"] = version
+		httpRoute.MetaData.Labels = labels
 	}
 
 	var apiPath utils.Path
