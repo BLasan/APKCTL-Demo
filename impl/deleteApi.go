@@ -16,32 +16,16 @@
 * under the License.
  */
 
-package utils
+package impl
 
 import (
-	"os"
+	"github.com/BLasan/APKCTL-Demo/k8s"
+	"github.com/BLasan/APKCTL-Demo/utils"
 )
 
-const ProjectName = "apkctl"
-
-// File Names and Paths
-var CurrentDir, _ = os.Getwd()
-
-const ConfigDirName = ".wso2apictl"
-
-const HttpRouteApiVersion = "gateway.networking.k8s.io/v1beta1"
-
-const HttpRouteKind = "HTTPRoute"
-
-const PathPrefix = "PathPrefix"
-
-const ServiceKind = "Service"
-
-// Kubernetes Constants
-const Kubectl = "kubectl"
-const K8sApply = "apply"
-
-const K8sDelete = "delete"
-const K8sHttpRoute = "httproute"
-
-const DefaultNamespace = "default"
+func DeleteAPI(namespace, apiName string) {
+	resource := utils.K8sHttpRoute + "/" + apiName
+	if err := k8s.ExecuteCommand(utils.Kubectl, utils.K8sDelete, resource, "-n", namespace); err != nil {
+		utils.HandleErrorAndExit("Error executing K8s command", err)
+	}
+}
