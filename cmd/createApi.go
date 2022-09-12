@@ -56,7 +56,7 @@ var CreateApiCmd = &cobra.Command{
 }
 
 func handleCreateApi(apiName string) {
-	impl.CreateAPI(file, dpNamespace, serviceUrl, apiName, isDryRun)
+	impl.CreateAPI(file, dpNamespace, serviceUrl, apiName, version, isDryRun)
 }
 
 func init() {
@@ -65,4 +65,5 @@ func init() {
 	CreateApiCmd.Flags().StringVar(&serviceUrl, "service-url", "", "Backend Service URL")
 	CreateApiCmd.Flags().StringVarP(&file, "file", "f", "", "Path to swagger/OAS definition/GraphQL SDL/WSDL")
 	CreateApiCmd.Flags().BoolVar(&isDryRun, "dry-run", false, "Generate configuration files")
+	CreateApiCmd.Flags().StringVarP(&version, "version", "", "", "Version of the API")
 }

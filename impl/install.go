@@ -19,9 +19,9 @@
 package impl
 
 import (
-	k8sConstants "github.com/BLasan/APKCTL-Demo/utils"
 	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 	"github.com/BLasan/APKCTL-Demo/utils"
+	k8sConstants "github.com/BLasan/APKCTL-Demo/utils"
 )
 
 const gatewayAPICRDsYaml = "https://github.com/envoyproxy/gateway/releases/download/v0.2.0-rc1/gatewayapi-crds.yaml"
@@ -31,7 +31,7 @@ const gatewayYaml = "https://raw.githubusercontent.com//envoyproxy/gateway/v0.2.
 
 func InstallPlatform() {
 	// Install components in K8s default cluster with default namespace
-	
+
 	// Envoy Gateway installation (Data Plane profile)
 	// Install the Gateway API CRDs
 	if err := k8sUtils.ExecuteCommand(k8sConstants.Kubectl, k8sConstants.K8sApply, "-f", gatewayAPICRDsYaml); err != nil {

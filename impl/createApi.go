@@ -33,7 +33,7 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func CreateAPI(filePath, namespace, serviceUrl, apiName string, isDryRun bool) error {
+func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) error {
 	fmt.Println(filePath)
 	_, content, err := resolveYamlOrJSON(filePath)
 	// fmt.Println("Content: ", string(content))
@@ -61,7 +61,13 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName string, isDryRun bool) e
 	httpRoute.HttpRouteSpec.HostNames = append(httpRoute.HttpRouteSpec.HostNames, "www.example.com")
 	parentRef.Name = "eg"
 	httpRoute.HttpRouteSpec.ParentRefs = append(httpRoute.HttpRouteSpec.ParentRefs, parentRef)
-	httpRoute.MetaData.Name = "httpbin-wso2"
+	httpRoute.MetaData.Name = apiName
+
+	if version == "" {
+		httpRoute.MetaData.Version = swaggerSpec.Info.Version
+	} else {
+		httpRoute.MetaData.Version = version
+	}
 
 	var apiPath utils.Path
 	var match utils.Match
