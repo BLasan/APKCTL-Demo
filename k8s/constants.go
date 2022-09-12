@@ -20,6 +20,8 @@ package k8s
 
 const Kubectl = "kubectl"
 const K8sApply = "apply"
+const K8sConfig = "config"
+const K8sView = "view"
 
 const K8sDelete = "delete"
 const K8sHttpRoute = "httproute"
