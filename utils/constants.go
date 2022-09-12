@@ -37,4 +37,14 @@ const PathPrefix = "PathPrefix"
 
 const ServiceKind = "Service"
 
+// Kubernetes Constants
+const Kubectl = "kubectl"
+const K8sApply = "apply"
+const K8sGet = "get"
+
+const K8sDelete = "delete"
+const K8sHttpRoute = "httproute"
+
 const DefaultNamespace = "default"
+const APIColumnsOutput = "NAME:.metadata.name,VERSION:.metadata.labels.version,HOSTNAMES:.spec.hostnames"
+const K8sOutputWithCustomColumns = "custom-columns=" + APIColumnsOutput

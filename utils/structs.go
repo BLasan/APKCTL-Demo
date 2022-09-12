@@ -26,8 +26,8 @@ type HTTPRouteConfig struct {
 }
 
 type MetaData struct {
-	Name    string `yaml:"name"`
-	Version string `yaml:"version"`
+	Name   string            `yaml:"name"`
+	Labels map[string]string `yaml:"labels,omitempty"`
 }
 
 type HttpRouteSpec struct {
