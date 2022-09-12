@@ -34,7 +34,7 @@ const gatewayYaml = "https://raw.githubusercontent.com//envoyproxy/gateway/v0.2.
 
 func InstallPlatform() {
 	// Install components in K8s default cluster with default namespace
-	fmt.Printf("Cluster Name: %s\nNamespace: %s\n\n", getClusterName(), getNamespace(),)
+	fmt.Printf("Cluster Name: %s\nNamespace: %s\n\n", getClusterName(), getNamespace())
 	
 	// Envoy Gateway installation (Data Plane profile)
 	// Install the Gateway API CRDs
