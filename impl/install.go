@@ -19,6 +19,7 @@
 package impl
 
 import (
+	"fmt"
 	"os/exec"
 	"strings"
 
@@ -33,7 +34,8 @@ const gatewayYaml = "https://raw.githubusercontent.com//envoyproxy/gateway/v0.2.
 
 func InstallPlatform() {
 	// Install components in K8s default cluster with default namespace
-
+	fmt.Printf("Cluster Name: %s\nNamespace: %s\n\n", getClusterName(), getNamespace(),)
+	
 	// Envoy Gateway installation (Data Plane profile)
 	// Install the Gateway API CRDs
 	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", gatewayAPICRDsYaml); err != nil {
@@ -61,6 +63,7 @@ func InstallPlatform() {
 		utils.HandleErrorAndExit("Error creating the Gateway", err)
 	}
 
+	fmt.Println("\nAll Done! We have configured APK to help you build and manage APIs with ease.")
 }
 
 func getPodStatus() string {
@@ -72,4 +75,20 @@ func getPodStatus() string {
 		utils.HandleErrorAndExit("Error while checking the pod status of a pod that is required for the Envoy Gateway", err)
 	}
 	return string(podStatus)
+}
+
+func getClusterName() string {
+	clusterName, _ := k8sUtils.GetCommandOutput(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sConfig,
+		k8sUtils.K8sView,
+		"--minify",
+		"-o",
+		"jsonpath='{.clusters[].name}'",
+	)
+	return strings.ReplaceAll(clusterName, "'", "")
+}
+
+func getNamespace() string {
+	return "default"
 }
