@@ -24,8 +24,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const InstallPlatformCmdLiteral = "install plarform"
-const InstallPlatformCmdShortDesc = "Install the APIM Control Plane components and Data Plane components in K8s"
+const InstallPlatformCmdLiteral = "install platform"
+const InstallPlatformCmdShortDesc = "Install APIM Control Plane component(s) and Data Plane component(s)"
 const InstallPlatformCmdLongDesc = `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
 
