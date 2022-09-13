@@ -28,5 +28,6 @@ func main() {
 	RootCmd.AddCommand(cmd.CreateCmd)
 	RootCmd.AddCommand(cmd.DeleteCmd)
 	RootCmd.AddCommand(cmd.GetCmd)
+	RootCmd.AddCommand(cmd.UninstallPlatformCmd)
 	execute()
 }
