@@ -18,11 +18,17 @@
 
 package k8s
 
+// Kubernetes Constants
 const Kubectl = "kubectl"
 
 const K8sApply = "apply"
+const K8sGet = "get"
 const K8sDelete = "delete"
 const K8sConfig = "config"
+
 const K8sView = "view"
 
 const K8sHttpRoute = "httproute"
+
+const MinifyFlag = "--minify"
+const OutputFormatFlag = "-o"

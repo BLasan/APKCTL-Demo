@@ -21,7 +21,7 @@ package impl
 import (
 	"fmt"
 
-	"github.com/BLasan/APKCTL-Demo/k8s"
+	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 	"github.com/BLasan/APKCTL-Demo/utils"
 )
 
@@ -31,14 +31,14 @@ func GetAPIs(namespace, output string, allNamespaces bool) {
 	}
 
 	if allNamespaces {
-		out, err := k8s.GetCommandOutput(utils.Kubectl, utils.K8sGet, utils.K8sHttpRoute, "-o", output)
+		out, err := k8sUtils.GetCommandOutput(k8sUtils.Kubectl, k8sUtils.K8sGet, k8sUtils.K8sHttpRoute, "-o", output)
 		if err != nil {
 			utils.HandleErrorAndExit("Error executing K8s command", err)
 		} else {
 			fmt.Println(out)
 		}
 	} else {
-		out, err := k8s.GetCommandOutput(utils.Kubectl, utils.K8sGet, utils.K8sHttpRoute, "-n", namespace, "-o", output)
+		out, err := k8sUtils.GetCommandOutput(k8sUtils.Kubectl, k8sUtils.K8sGet, k8sUtils.K8sHttpRoute, "-n", namespace, "-o", output)
 		if err != nil {
 			utils.HandleErrorAndExit("Error executing K8s command", err)
 		} else {

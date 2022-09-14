@@ -27,7 +27,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/BLasan/APKCTL-Demo/k8s"
+	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 	"github.com/BLasan/APKCTL-Demo/utils"
 	"github.com/go-openapi/spec"
 	"gopkg.in/yaml.v2"
@@ -147,7 +147,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	args := []string{"apply", "-f", desFilePath}
 
 	if !isDryRun {
-		k8s.ExecuteCommand("kubectl", args...)
+		k8sUtils.ExecuteCommand("kubectl", args...)
 	}
 
 	return nil
