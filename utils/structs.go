@@ -26,8 +26,9 @@ type HTTPRouteConfig struct {
 }
 
 type MetaData struct {
-	Name   string            `yaml:"name"`
-	Labels map[string]string `yaml:"labels,omitempty"`
+	Name      string            `yaml:"name,omitempty"`
+	Namespace string            `yaml:"namespace,omitempty"`
+	Labels    map[string]string `yaml:"labels,omitempty"`
 }
 
 type HttpRouteSpec struct {
@@ -46,9 +47,16 @@ type Rule struct {
 }
 
 type Match struct {
-	Path    Path     `yaml:"path,omitempty"`
-	Headers []Header `yaml:"headers,omitempty"`
+	Path        Path         `yaml:"path,omitempty"`
+	Headers     []Header     `yaml:"headers,omitempty"`
+	QueryParams []QueryParam `yaml:"queryParams,omitempty"`
 	// BackendRefs BackendRef `yaml:"backendRefs,omitempty"`
+}
+
+type QueryParam struct {
+	Type  string `yaml:"type"`
+	Name  string `yaml:"name"`
+	Value string `yaml:"value"`
 }
 
 type Path struct {

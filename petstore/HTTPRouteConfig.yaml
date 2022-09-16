@@ -2,7 +2,8 @@ apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
   name: petstore
-  version: 1.0.6
+  labels:
+    version: 1.0.6
 spec:
   parentRefs:
   - name: eg
@@ -10,30 +11,30 @@ spec:
   - www.example.com
   rules:
   - matches:
+    # - path:
+    #     type: PathPrefix
+    #     value: /user/createWithArray
+    # - path:
+    #     type: PathPrefix
+    #     value: /user/logout
+    # - path:
+    #     type: PathPrefix
+    #     value: /user
+    # - path:
+    #     type: PathPrefix
+    #     value: /pet
+    # - path:
+    #     type: PathPrefix
+    #     value: /user/createWithList
+    # - path:
+    #     type: PathPrefix
+    #     value: /pet/{petId}/uploadImage
+    # - path:
+    #     type: PathPrefix
+    #     value: /store/order
     - path:
         type: PathPrefix
-        value: /user/logout
-    - path:
-        type: PathPrefix
-        value: /pet
-    - path:
-        type: PathPrefix
-        value: /pet/findByTags
-    - path:
-        type: PathPrefix
-        value: /store/order/{orderId}
-    - path:
-        type: PathPrefix
-        value: /user
-    - path:
-        type: PathPrefix
-        value: /user/{username}
-    - path:
-        type: PathPrefix
-        value: /pet/findByStatus
-    - path:
-        type: PathPrefix
-        value: /store/inventory
+        value: /api/v3/pet
     backendRefs:
     - name: httpbin
       port: 80

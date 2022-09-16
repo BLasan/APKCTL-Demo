@@ -36,7 +36,7 @@ func UninstallPlatform() {
 	}
 
 	// Delete the GatewayClass
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "gc/eg"); err != nil {
+	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "gatewayClass/eg"); err != nil {
 		utils.HandleErrorAndExit("Error deleting the Gateway Class", err)
 	}
 
