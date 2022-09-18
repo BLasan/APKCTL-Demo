@@ -26,11 +26,6 @@ const HttpRouteKind = "HTTPRoute"
 const PathPrefix = "PathPrefix"
 const ServiceKind = "Service"
 
-// Constants for metadata on k8s configs
-var ClusterName = ""
-var Context = ""
-var Namespace = ""
-
 const DefaultNamespace = "default"
 
 // Constants for get APIs command
