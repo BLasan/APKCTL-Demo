@@ -34,15 +34,11 @@ const gatewayYaml = "https://raw.githubusercontent.com//envoyproxy/gateway/v0.2.
 
 func InstallPlatform() {
 	// Install components in K8s default cluster with default namespace
-
-	utils.ClusterName = getClusterName()
-	utils.Context = getContext()
-	utils.Namespace = getNamespace()
 	fmt.Printf(
 		"Connected Cluster Name: %s\nContext: %s\nNamespace: %s\n\n",
-		utils.ClusterName,
-		utils.Context,
-		utils.Namespace,
+		utils.GetClusterName(),
+		utils.GetContext(),
+		utils.GetNamespace(),
 	)
 
 	// Envoy Gateway installation (Data Plane profile)
@@ -84,46 +80,4 @@ func getPodStatus() string {
 		utils.HandleErrorAndExit("Error while checking the pod status of a pod that is required for the Envoy Gateway", err)
 	}
 	return string(podStatus)
-}
-
-func getClusterName() string {
-	clusterName, _ := k8sUtils.GetCommandOutput(
-		k8sUtils.Kubectl,
-		k8sUtils.K8sConfig,
-		k8sUtils.K8sView,
-		k8sUtils.MinifyFlag,
-		k8sUtils.OutputFormatFlag,
-		"jsonpath='{.clusters[].name}'",
-	)
-	clusterName = strings.ReplaceAll(clusterName, "'", "")
-	return clusterName
-}
-
-func getContext() string {
-	context, _ := k8sUtils.GetCommandOutput(
-		k8sUtils.Kubectl,
-		k8sUtils.K8sConfig,
-		k8sUtils.K8sView,
-		k8sUtils.MinifyFlag,
-		k8sUtils.OutputFormatFlag,
-		"jsonpath='{.contexts[].name}'",
-	)
-	context = strings.ReplaceAll(context, "'", "")
-	return context
-}
-
-func getNamespace() string {
-	namespace, _ := k8sUtils.GetCommandOutput(
-		k8sUtils.Kubectl,
-		k8sUtils.K8sConfig,
-		k8sUtils.K8sView,
-		k8sUtils.MinifyFlag,
-		k8sUtils.OutputFormatFlag,
-		"jsonpath='{.contexts[].context.namespace}'",
-	)
-	namespace = strings.ReplaceAll(namespace, "'", "")
-	if namespace == "" {
-		namespace = utils.DefaultNamespace
-	}
-	return namespace
 }

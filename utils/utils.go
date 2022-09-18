@@ -18,6 +18,57 @@
 
 package utils
 
+import (
+	"strings"
+
+	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
+)
+
 func GetAPKCTLHomeDir() string {
 	return "/Users/benura/Desktop/APKCTL"
+}
+
+// Retrieve name of the connected cluster
+func GetClusterName() string {
+	clusterName, _ := k8sUtils.GetCommandOutput(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sConfig,
+		k8sUtils.K8sView,
+		k8sUtils.MinifyFlag,
+		k8sUtils.OutputFormatFlag,
+		"jsonpath='{.clusters[].name}'",
+	)
+	clusterName = strings.ReplaceAll(clusterName, "'", "")
+	return clusterName
+}
+
+// Retrieve name of the current context
+func GetContext() string {
+	context, _ := k8sUtils.GetCommandOutput(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sConfig,
+		k8sUtils.K8sView,
+		k8sUtils.MinifyFlag,
+		k8sUtils.OutputFormatFlag,
+		"jsonpath='{.contexts[].name}'",
+	)
+	context = strings.ReplaceAll(context, "'", "")
+	return context
+}
+
+// Retrieve the namespace
+func GetNamespace() string {
+	namespace, _ := k8sUtils.GetCommandOutput(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sConfig,
+		k8sUtils.K8sView,
+		k8sUtils.MinifyFlag,
+		k8sUtils.OutputFormatFlag,
+		"jsonpath='{.contexts[].context.namespace}'",
+	)
+	namespace = strings.ReplaceAll(namespace, "'", "")
+	if namespace == "" {
+		namespace = DefaultNamespace
+	}
+	return namespace
 }
