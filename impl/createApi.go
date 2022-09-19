@@ -44,11 +44,14 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	}
 
 	var swaggerSpec spec.Swagger
-	err = json.Unmarshal(content, &swaggerSpec)
 
-	if err != nil {
-		fmt.Println(err)
-		return err
+	if content != nil {
+		err = json.Unmarshal(content, &swaggerSpec)
+
+		if err != nil {
+			fmt.Println(err)
+			return err
+		}
 	}
 
 	// fmt.Println("Swagger Spec: ", swaggerSpec.Paths.Paths)
@@ -62,6 +65,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	parentRef.Name = "eg"
 	httpRoute.HttpRouteSpec.ParentRefs = append(httpRoute.HttpRouteSpec.ParentRefs, parentRef)
 	httpRoute.MetaData.Name = apiName
+	// httpRoute.MetaData.Namespace = namespace
 
 	labels := make(map[string]string)
 
@@ -90,32 +94,54 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 
 	fmt.Println(serviceUrlArr)
 
-	backendRef.Kind = utils.ServiceKind
-
-	counter := 1
-
-	for path, pathItem := range swaggerSpec.Paths.Paths {
-		// maximum 8 paths are allowed
-		if counter > 8 {
-			break
-		}
-
+	// if swagger path is not defined do not iterate over it
+	if filePath == "" {
 		apiPath.Type = utils.PathPrefix
-		apiPath.Value = path
+		apiPath.Value = "/"
 		match.Path = apiPath
-
 		rule.Matches = append(rule.Matches, match)
+	} else {
+		counter := 1
 
-		fmt.Println("Path: ", path)
-		if pathItem.Post != nil {
-			fmt.Println("Description Items: ", pathItem.Post.Description)
+		for path, pathItem := range swaggerSpec.Paths.Paths {
+			// maximum 8 paths are allowed
+			if counter > 8 {
+				break
+			}
+
+			index := strings.IndexAny(path, "{")
+			if index >= 0 {
+				path = path[:index-1]
+			}
+
+			// append "/api/v3" to invoke the petstore apis
+			path = "/api/v3" + path
+
+			fmt.Println("Path: ", path)
+
+			// pathArr := strings.Split(path, "/")
+			// sort.Strings(pathArr)
+			// path = utils.FindPathParam(pathArr)
+
+			apiPath.Type = utils.PathPrefix
+			apiPath.Value = path
+			match.Path = apiPath
+
+			rule.Matches = append(rule.Matches, match)
+
+			if pathItem.Post != nil {
+				fmt.Println("Description Items: ", pathItem.Post.Description)
+			}
+
+			counter++
+
 		}
-
-		counter++
-
 	}
 
+	backendRef.Kind = utils.ServiceKind
+
 	backendRef.Name = serviceUrlArr[0]
+	// backendRef.Namespace = serviceUrlArr[1]
 	backendRef.Port, err = strconv.Atoi(strings.Split(serviceUrlArr[len(serviceUrlArr)-1], ":")[1])
 
 	rule.BackendRefs = append(rule.BackendRefs, backendRef)

@@ -26,5 +26,6 @@ require (
 	github.com/google/uuid v1.3.0
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
+	golang.org/x/exp v0.0.0-20220916125017-b168a2c6b86b
 	google.golang.org/protobuf v1.27.1
 )

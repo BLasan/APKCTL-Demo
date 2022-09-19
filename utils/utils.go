@@ -72,3 +72,36 @@ func GetNamespace() string {
 	}
 	return namespace
 }
+
+func FindPathParam(array []string) string {
+	pathPrefix := []string{}
+	// low := 0
+	// high := len(array) - 1
+
+	// for low <= high {
+	// 	mid := (low + high) / 2
+	// 	if array[mid] < param {
+	// 		low = mid + 1
+	// 	} else {
+	// 		high = mid - 1
+	// 	}
+	// }
+
+	// if low == len(array) || strings.ContainsAny(array[low], param) {
+	// 	return -1
+	// }
+
+	// return low
+
+	for index, item := range array {
+		if index == 0 {
+			item = "/" + item
+		}
+		pathPrefix = append(pathPrefix, item)
+		if strings.ContainsAny(item, "{}") {
+			return strings.Join(pathPrefix, "/")
+		}
+	}
+
+	return ""
+}

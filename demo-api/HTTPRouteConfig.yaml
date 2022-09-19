@@ -1,7 +1,7 @@
 apiVersion: gateway.networking.k8s.io/v1beta1
 kind: HTTPRoute
 metadata:
-  name: petstore
+  name: demo-api
   labels:
     version: 1.0.6
 spec:
@@ -13,28 +13,28 @@ spec:
   - matches:
     - path:
         type: PathPrefix
+        value: /api/v3/pet/findByTags
+    - path:
+        type: PathPrefix
+        value: /api/v3/pet/findByStatus
+    - path:
+        type: PathPrefix
         value: /api/v3/store/order
     - path:
         type: PathPrefix
         value: /api/v3/pet
     - path:
         type: PathPrefix
-        value: /api/v3/pet
+        value: /api/v3/user/login
     - path:
         type: PathPrefix
-        value: /api/v3/user/logout
-    - path:
-        type: PathPrefix
-        value: /api/v3/user/createWithList
-    - path:
-        type: PathPrefix
-        value: /api/v3/store/order
+        value: /api/v3/store/inventory
     - path:
         type: PathPrefix
         value: /api/v3/user/createWithArray
     - path:
         type: PathPrefix
-        value: /api/v3/store/inventory
+        value: /api/v3/pet
     backendRefs:
     - name: httpbin
       port: 80

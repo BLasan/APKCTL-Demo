@@ -41,10 +41,10 @@ spec:
           name: httpbin
           ports:
             - containerPort: 8080
-          env:
-            - name: SWAGGER_BASE_PATH
-              value: /v2
-            - name: SWAGGER_HOST
-              value: http://petstore.swagger.io
-            - name: SWAGGER_URL
-              value: http://localhost
+          # env:
+          #   - name: SWAGGER_BASE_PATH
+          #     value: /v2
+          #   - name: SWAGGER_HOST
+          #     value: http://petstore.swagger.io
+          #   - name: SWAGGER_URL
+          #     value: http://localhost

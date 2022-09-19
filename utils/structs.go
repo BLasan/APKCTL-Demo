@@ -71,11 +71,12 @@ type Header struct {
 }
 
 type BackendRef struct {
-	Name   string `yaml:"name"`
-	Port   int    `yaml:"port"`
-	Group  string `yaml:"group"`
-	Kind   string `yaml:"kind,omitempty"`
-	Weight string `yaml:"weight,omitempty"`
+	Name      string `yaml:"name"`
+	Namespace string `yaml:"namespace,omitempty"`
+	Port      int    `yaml:"port"`
+	Group     string `yaml:"group"`
+	Kind      string `yaml:"kind,omitempty"`
+	Weight    string `yaml:"weight,omitempty"`
 }
 
 //  apiVersion: gateway.networking.k8s.io/v1beta1
