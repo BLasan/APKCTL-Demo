@@ -19,13 +19,15 @@
 package utils
 
 import (
+	"os"
 	"strings"
 
 	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 )
 
 func GetAPKCTLHomeDir() string {
-	return "/Users/benura/Desktop/APKCTL"
+	pwd, _ := os.Getwd()
+	return pwd
 }
 
 // Retrieve name of the connected cluster

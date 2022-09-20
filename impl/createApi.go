@@ -157,9 +157,9 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		return err
 	}
 
-	dirPath := path.Join(utils.GetAPKCTLHomeDir(), apiName)
+	dirPath := path.Join(utils.GetAPKCTLHomeDir(), utils.APIProjectsDir, apiName)
 
-	os.Mkdir(dirPath, os.ModePerm)
+	os.MkdirAll(dirPath, os.ModePerm)
 
 	desFilePath := path.Join(dirPath, "HTTPRouteConfig.yaml")
 
