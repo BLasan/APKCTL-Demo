@@ -34,14 +34,13 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
-func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) error {
+func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) {
 	fmt.Println(filePath)
 	_, content, err := resolveYamlOrJSON(filePath)
 	// fmt.Println("Content: ", string(content))
 
 	if err != nil {
-		fmt.Println("Error: ", err)
-		return err
+		utils.HandleErrorAndExit("Error resolving swagger file", err)
 	}
 
 	var swaggerSpec spec.Swagger
@@ -50,8 +49,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		err = json.Unmarshal(content, &swaggerSpec)
 
 		if err != nil {
-			fmt.Println(err)
-			return err
+			utils.HandleErrorAndExit("Error unmarshalling swagger", err)
 		}
 	}
 
@@ -70,7 +68,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 
 	labels := make(map[string]string)
 
-	fmt.Println(version)
+	// fmt.Println(version)
 
 	if version == "" {
 		labels["version"] = swaggerSpec.Info.Version
@@ -93,7 +91,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		serviceUrlArr = strings.Split(swaggerSpec.Host, ".")
 	}
 
-	fmt.Println(serviceUrlArr)
+	// fmt.Println(serviceUrlArr)
 
 	// if swagger path is not defined do not iterate over it
 	if filePath == "" {
@@ -104,7 +102,8 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	} else {
 		counter := 1
 
-		for path, pathItem := range swaggerSpec.Paths.Paths {
+		// path & path item
+		for path, _ := range swaggerSpec.Paths.Paths {
 			// maximum 8 paths are allowed
 			if counter > 8 {
 				break
@@ -118,7 +117,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 			// append "/api/v3" to invoke the petstore apis
 			path = "/api/v3" + path
 
-			fmt.Println("Path: ", path)
+			// fmt.Println("Path: ", path)
 
 			// pathArr := strings.Split(path, "/")
 			// sort.Strings(pathArr)
@@ -130,9 +129,9 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 
 			rule.Matches = append(rule.Matches, match)
 
-			if pathItem.Post != nil {
-				fmt.Println("Description Items: ", pathItem.Post.Description)
-			}
+			// if pathItem.Post != nil {
+			// 	fmt.Println("Description Items: ", pathItem.Post.Description)
+			// }
 
 			counter++
 
@@ -149,18 +148,18 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	httpRoute.HttpRouteSpec.Rules = append(httpRoute.HttpRouteSpec.Rules, rule)
 
 	if err != nil {
-		return err
+		utils.HandleErrorAndExit("Error extracting port number", err)
 	}
 
 	file, err := yaml.Marshal(&httpRoute)
 
 	if err != nil {
-		return err
+		utils.HandleErrorAndExit("Error marshalling httproute file", err)
 	}
 
 	dirPath, err := utils.GetAPKCTLHomeDir()
 	if err != nil {
-		return err
+		utils.HandleErrorAndExit("Error getting apkctl home directory", err)
 	}
 
 	dirPath = path.Join(dirPath, apiName)
@@ -173,7 +172,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	err = ioutil.WriteFile(desFilePath, file, 0644)
 
 	if err != nil {
-		return err
+		utils.HandleErrorAndExit("Error writing httproute file", err)
 	}
 
 	createConfigMap(filePath, dirPath, namespace)
@@ -181,10 +180,17 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	args := []string{"apply", "-f", filepath.Join(dirPath, "")}
 
 	if !isDryRun {
-		k8sUtils.ExecuteCommand("kubectl", args...)
-	}
+		err = k8sUtils.ExecuteCommand("kubectl", args...)
+		os.RemoveAll(dirPath)
 
-	return nil
+		if err != nil {
+			utils.HandleErrorAndExit("Error Deploying the API", err)
+		}
+
+		fmt.Println("Successfully Deployed the API" + apiName + " on to the K8s Cluster")
+	} else {
+		fmt.Println("Successfully Created " + apiName + " directory with HttpRouteConfig & ConfigMap files!")
+	}
 
 }
 
