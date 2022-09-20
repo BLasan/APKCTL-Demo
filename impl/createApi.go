@@ -160,10 +160,6 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		utils.HandleErrorAndExit("Error marshalling httproute file", err)
 	}
 
-	if err != nil {
-		utils.HandleErrorAndExit("Error writing httproute file", err)
-	}
-
 	if !isDryRun {
 		dirPath, err = os.MkdirTemp("", apiName)
 
