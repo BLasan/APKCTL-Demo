@@ -24,6 +24,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -166,7 +167,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 
 	os.MkdirAll(dirPath, os.ModePerm)
 
-	desFilePath := path.Join(dirPath, "HTTPRouteConfig.yaml")
+	desFilePath := filepath.Join(dirPath, "HTTPRouteConfig.yaml")
 
 	// directory location can be defined in the apkctl config file
 	err = ioutil.WriteFile(desFilePath, file, 0644)
@@ -175,7 +176,9 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		return err
 	}
 
-	args := []string{"apply", "-f", desFilePath}
+	createConfigMap(filePath, dirPath, namespace)
+
+	args := []string{"apply", "-f", filepath.Join(dirPath, "")}
 
 	if !isDryRun {
 		k8sUtils.ExecuteCommand("kubectl", args...)
@@ -217,4 +220,55 @@ func resolveYamlOrJSON(filename string) (string, []byte, error) {
 	}
 
 	return "", nil, fmt.Errorf("%s was not found as a YAML or JSON", filename)
+}
+
+func createConfigMap(filepath, dirPath, namespace string) {
+	configmap := utils.ConfigMap{}
+	configmap.ApiVersion = "v1"
+	configmap.Kind = "ConfigMap"
+	configmap.MetaData.Name = "swagger-configmap"
+
+	if namespace != "" {
+		configmap.MetaData.Namespace = namespace
+	}
+
+	content := readSwaggerDef(filepath)
+
+	if content == "" {
+		fmt.Println("Empty Swagger")
+		// handle error and exit
+	}
+
+	data := make(map[string]string)
+
+	data["swagger"] = content
+
+	configmap.Data = data
+
+	file, err := yaml.Marshal(&configmap)
+
+	if err != nil {
+		utils.HandleErrorAndExit("Error Marshaling", err)
+	}
+
+	desFilePath := path.Join(dirPath, "ConfigMap.yaml")
+
+	// directory location can be defined in the apkctl config file
+	err = ioutil.WriteFile(desFilePath, file, 0644)
+
+	if err != nil {
+		utils.HandleErrorAndExit("Error creating config file", err)
+	}
+}
+
+func readSwaggerDef(filename string) string {
+	if info, err := os.Stat(filename); err == nil && !info.IsDir() {
+		content, err := ioutil.ReadFile(filename)
+		if err != nil {
+			utils.HandleErrorAndExit("Error Reading Swagger File", err)
+		}
+		return string(content)
+	}
+
+	return ""
 }
