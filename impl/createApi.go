@@ -157,7 +157,12 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		return err
 	}
 
-	dirPath := path.Join(utils.GetAPKCTLHomeDir(), utils.APIProjectsDir, apiName)
+	dirPath, err := utils.GetAPKCTLHomeDir()
+	if err != nil {
+		return err
+	}
+
+	dirPath = path.Join(dirPath, apiName)
 
 	os.MkdirAll(dirPath, os.ModePerm)
 

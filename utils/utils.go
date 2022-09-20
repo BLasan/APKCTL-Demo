@@ -25,9 +25,8 @@ import (
 	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 )
 
-func GetAPKCTLHomeDir() string {
-	pwd, _ := os.Getwd()
-	return pwd
+func GetAPKCTLHomeDir() (string, error) {
+	return os.Getwd()
 }
 
 // Retrieve name of the connected cluster
