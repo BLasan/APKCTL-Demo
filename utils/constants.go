@@ -32,3 +32,13 @@ const DefaultNamespace = "default"
 // Constants for get APIs command
 const APIColumnsOutput = "NAME:.metadata.name,VERSION:.metadata.labels.version,HOSTNAMES:.spec.hostnames"
 const K8sOutputWithCustomColumns = "custom-columns=" + APIColumnsOutput
+
+// Constants used for version identification of API definitions
+const (
+	Swagger      string = "swagger"
+	OpenAPI      string = "openapi"
+	Swagger2     string = "swagger_2"
+	OpenAPI3     string = "openapi_3"
+	NotDefined   string = "not_defined"
+	NotSupported string = "not_supported"
+)
