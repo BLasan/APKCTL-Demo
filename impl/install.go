@@ -43,11 +43,21 @@ func InstallPlatform() {
 
 	// Envoy Gateway installation (Data Plane profile)
 	// Install the Gateway API CRDs
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", gatewayAPICRDsYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sApply,
+		k8sUtils.FilenameFlag,
+		gatewayAPICRDsYaml,
+	); err != nil {
 		utils.HandleErrorAndExit("Error installing Gateway API CRDs", err)
 	}
 	// Run Envoy Gateway
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", envoyGatewayInstallYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sApply,
+		k8sUtils.FilenameFlag,
+		envoyGatewayInstallYaml,
+	); err != nil {
 		utils.HandleErrorAndExit("Error installing Envoy Gateway", err)
 	}
 
@@ -60,11 +70,21 @@ func InstallPlatform() {
 	}
 
 	// Create the GatewayClass
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", gatewayClassYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sApply,
+		k8sUtils.FilenameFlag,
+		gatewayClassYaml,
+	); err != nil {
 		utils.HandleErrorAndExit("Error creating the Gateway Class", err)
 	}
 	// Create the Gateway
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sApply, "-f", gatewayYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sApply,
+		k8sUtils.FilenameFlag,
+		gatewayYaml,
+	); err != nil {
 		utils.HandleErrorAndExit("Error creating the Gateway", err)
 	}
 

@@ -182,16 +182,16 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 
 		createConfigMap(filePath, dirPath, namespace)
 
-		args := []string{"apply", "-f", filepath.Join(dirPath, "")}
+		args := []string{k8sUtils.K8sApply, k8sUtils.FilenameFlag, filepath.Join(dirPath, "")}
 
-		err = k8sUtils.ExecuteCommand("kubectl", args...)
+		err = k8sUtils.ExecuteCommand(k8sUtils.Kubectl, args...)
 		os.RemoveAll(dirPath)
 
 		if err != nil {
 			utils.HandleErrorAndExit("Error Deploying the API", err)
 		}
 
-		fmt.Println("Successfully Deployed the API" + apiName + " on to the K8s Cluster")
+		fmt.Println("Successfully deployed API " + apiName)
 	} else {
 		dirPath, err = utils.GetAPKCTLHomeDir()
 		if err != nil {
