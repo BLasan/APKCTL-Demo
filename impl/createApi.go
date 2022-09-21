@@ -30,34 +30,49 @@ import (
 
 	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 	"github.com/BLasan/APKCTL-Demo/utils"
+	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-openapi/spec"
 	"gopkg.in/yaml.v2"
+	"net/url"
 )
 
 var dirPath string
 var desFilePath string
 
 func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) {
-	fmt.Println(filePath)
-	_, content, err := resolveYamlOrJSON(filePath)
-	// fmt.Println("Content: ", string(content))
-
+	
+	apiContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
-		utils.HandleErrorAndExit("Error resolving swagger file", err)
+		utils.HandleErrorAndExit("Error encountered while reading API definition file", err)
 	}
 
-	var swaggerSpec spec.Swagger
+	definitionJsn, err := utils.ToJSON(apiContent)
+	if err != nil {
+		utils.HandleErrorAndExit("Error converting API definition file to json", err)
+	}
 
-	if content != nil {
-		err = json.Unmarshal(content, &swaggerSpec)
+	definitionVersion := utils.FindAPIDefinitionVersion(definitionJsn)
 
+	if definitionVersion == utils.Swagger2 {
+		var swaggerSpec spec.Swagger
+		err = json.Unmarshal(definitionJsn, &swaggerSpec)
 		if err != nil {
 			utils.HandleErrorAndExit("Error unmarshalling swagger", err)
 		}
+		createAndDeploySwaggerAPI(swaggerSpec, filePath, namespace, serviceUrl, apiName, version, isDryRun)
+	} else if definitionVersion == utils.OpenAPI3 {
+		var openAPISpec openapi3.T
+		err = json.Unmarshal(definitionJsn, &openAPISpec)
+		if err != nil {
+			utils.HandleErrorAndExit("Error unmarshalling OpenAPI Definition", err)
+		}
+		createAndDeployOpenAPI(openAPISpec, filePath, namespace, serviceUrl, apiName, version, isDryRun)
+	} else {
+		utils.HandleErrorAndExit("Error resolving API definition. Provided file kind is not supported or not acceptable.", nil)
 	}
+}
 
-	// fmt.Println("Swagger Spec: ", swaggerSpec.Paths.Paths)
-
+func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) {
 	httpRoute := utils.HTTPRouteConfig{}
 	var parentRef utils.ParentRef
 
@@ -70,8 +85,6 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	// httpRoute.MetaData.Namespace = namespace
 
 	labels := make(map[string]string)
-
-	// fmt.Println(version)
 
 	if version == "" {
 		labels["version"] = swaggerSpec.Info.Version
@@ -94,8 +107,6 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		serviceUrlArr = strings.Split(swaggerSpec.Host, ".")
 	}
 
-	// fmt.Println(serviceUrlArr)
-
 	// if swagger path is not defined do not iterate over it
 	if filePath == "" {
 		apiPath.Type = utils.PathPrefix
@@ -106,7 +117,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		counter := 1
 
 		// path & path item
-		for path, _ := range swaggerSpec.Paths.Paths {
+		for path := range swaggerSpec.Paths.Paths {
 			// maximum 8 paths are allowed
 			if counter > 8 {
 				break
@@ -145,111 +156,187 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 
 	backendRef.Name = serviceUrlArr[0]
 	// backendRef.Namespace = serviceUrlArr[1]
+	var err error
 	backendRef.Port, err = strconv.Atoi(strings.Split(serviceUrlArr[len(serviceUrlArr)-1], ":")[1])
 
 	rule.BackendRefs = append(rule.BackendRefs, backendRef)
 	httpRoute.HttpRouteSpec.Rules = append(httpRoute.HttpRouteSpec.Rules, rule)
-
 	if err != nil {
 		utils.HandleErrorAndExit("Error extracting port number", err)
 	}
 
 	file, err := yaml.Marshal(&httpRoute)
-
 	if err != nil {
 		utils.HandleErrorAndExit("Error marshalling httproute file", err)
 	}
 
 	if !isDryRun {
-		dirPath, err = os.MkdirTemp("", apiName)
-
-		if err != nil {
-			utils.HandleErrorAndExit("Error creating the temp directory", err)
-		}
-
-		fmt.Println(dirPath)
-
-		defer os.RemoveAll(dirPath)
-
-		desFilePath = filepath.Join(dirPath, "HTTPRouteConfig.yaml")
-
-		// directory location can be defined in the apkctl config file
-		err = ioutil.WriteFile(desFilePath, file, 0644)
-
-		if err != nil {
-			utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
-		}
-
-		createConfigMap(filePath, dirPath, namespace)
-
-		args := []string{k8sUtils.K8sApply, k8sUtils.FilenameFlag, filepath.Join(dirPath, "")}
-
-		err = k8sUtils.ExecuteCommand(k8sUtils.Kubectl, args...)
-		os.RemoveAll(dirPath)
-
-		if err != nil {
-			utils.HandleErrorAndExit("Error Deploying the API", err)
-		}
-
-		fmt.Println("Successfully deployed API " + apiName)
+		handleDeploy(file, filePath, namespace, apiName)
 	} else {
-		dirPath, err = utils.GetAPKCTLHomeDir()
-		if err != nil {
-			utils.HandleErrorAndExit("Error getting apkctl home directory", err)
-		}
-
-		dirPath = path.Join(dirPath, apiName)
-
-		os.MkdirAll(dirPath, os.ModePerm)
-
-		desFilePath = filepath.Join(dirPath, "HTTPRouteConfig.yaml")
-
-		// directory location can be defined in the apkctl config file
-		err = ioutil.WriteFile(desFilePath, file, 0644)
-
-		if err != nil {
-			utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
-		}
-
-		createConfigMap(filePath, dirPath, namespace)
-
-		fmt.Println("Successfully Created " + apiName + " directory with HttpRouteConfig & ConfigMap files!")
+		handleDryRun(file, filePath, namespace, apiName)
 	}
-
 }
 
-func resolveYamlOrJSON(filename string) (string, []byte, error) {
-	// lookup for yaml
-	yamlFp := filename
-	if info, err := os.Stat(yamlFp); err == nil && !info.IsDir() {
-		// utils.Logln(utils.LogPrefixInfo+"Loading", yamlFp)
-		// read it
-		fn := yamlFp
-		yamlContent, err := ioutil.ReadFile(fn)
-		if err != nil {
-			return "", nil, err
-		}
-		// load it as yaml
-		jsonContent, err := utils.YamlToJson(yamlContent)
-		if err != nil {
-			return "", nil, err
-		}
-		return fn, jsonContent, nil
+func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) {
+	httpRoute := utils.HTTPRouteConfig{}
+	var parentRef utils.ParentRef
+
+	httpRoute.ApiVersion = utils.HttpRouteApiVersion
+	httpRoute.Kind = utils.HttpRouteKind
+	httpRoute.HttpRouteSpec.HostNames = append(httpRoute.HttpRouteSpec.HostNames, "www.example.com")
+	parentRef.Name = "eg"
+	httpRoute.HttpRouteSpec.ParentRefs = append(httpRoute.HttpRouteSpec.ParentRefs, parentRef)
+	httpRoute.MetaData.Name = apiName
+
+	labels := make(map[string]string)
+
+	if version == "" {
+		labels["version"] = openAPISpec.Info.Version
+		httpRoute.MetaData.Labels = labels
+	} else {
+		labels["version"] = version
+		httpRoute.MetaData.Labels = labels
 	}
 
-	jsonFp := filename + ".json"
-	if info, err := os.Stat(jsonFp); err == nil && !info.IsDir() {
-		// utils.Logln(utils.LogPrefixInfo+"Loading", jsonFp)
-		// read it
-		fn := jsonFp
-		jsonContent, err := ioutil.ReadFile(fn)
-		if err != nil {
-			return "", nil, err
+	var apiPath utils.Path
+	var match utils.Match
+	var rule utils.Rule
+	var backendRef utils.BackendRef
+
+	var serviceUrlArr []string
+
+	if serviceUrl != "" {
+		serviceUrlArr = strings.Split(serviceUrl, ".")
+	} else {
+		for _, serverEntry := range openAPISpec.Servers {
+			serviceUrlArr = append(serviceUrlArr, serverEntry.URL)
 		}
-		return fn, jsonContent, nil
+		// serviceUrlArr = append(serviceUrlArr, openAPISpec.Servers[0].URL)
 	}
 
-	return "", nil, fmt.Errorf("%s was not found as a YAML or JSON", filename)
+	// if swagger path is not defined do not iterate over it
+	if filePath == "" {
+		apiPath.Type = utils.PathPrefix
+		apiPath.Value = "/"
+		match.Path = apiPath
+		rule.Matches = append(rule.Matches, match)
+	} else {
+		counter := 1
+
+		// path & path item
+		for path := range openAPISpec.Paths {
+			// maximum 8 paths are allowed
+			if counter > 8 {
+				break
+			}
+
+			index := strings.IndexAny(path, "{")
+			if index >= 0 {
+				path = path[:index-1]
+			}
+
+			// append "/api/v3" to invoke the petstore apis
+			path = "/api/v3" + path
+
+			apiPath.Type = utils.PathPrefix
+			apiPath.Value = path
+			match.Path = apiPath
+
+			rule.Matches = append(rule.Matches, match)
+
+			counter++
+		}
+	}
+	
+	backendRef.Kind = utils.ServiceKind
+
+	// backendRef.Namespace = serviceUrlArr[1]
+	parsedURL, err := url.ParseRequestURI(serviceUrlArr[0])
+	if err != nil {
+		utils.HandleErrorAndExit("Error while parsing the service URL.", err)
+	}
+
+	backendRef.Name = strings.Split(parsedURL.Host, ".")[0]
+	if parsedURL.Port() != "" {
+		u32, err := strconv.ParseUint(parsedURL.Port(), 10, 32)
+		if err != nil {
+			fmt.Println("Endpoint port is not in the expected format.", err)
+		}
+		backendRef.Port = int(uint32(u32))
+	} else {
+		backendRef.Port = int(uint32(80))
+	}
+
+	rule.BackendRefs = append(rule.BackendRefs, backendRef)
+	httpRoute.HttpRouteSpec.Rules = append(httpRoute.HttpRouteSpec.Rules, rule)
+
+	file, err := yaml.Marshal(&httpRoute)
+	if err != nil {
+		utils.HandleErrorAndExit("Error marshalling httproute file.", err)
+	}
+
+	if !isDryRun {
+		handleDeploy(file, filePath, namespace, apiName)
+	} else {
+		handleDryRun(file, filePath, namespace, apiName)
+	}
+}
+
+// Deploy the 
+func handleDeploy(file []byte, filePath, namespace, apiName string) {
+	var err error
+	dirPath, err = os.MkdirTemp("", apiName)
+	if err != nil {
+		utils.HandleErrorAndExit("Error creating the temp directory", err)
+	}
+
+	defer os.RemoveAll(dirPath)
+
+	desFilePath = filepath.Join(dirPath, "HTTPRouteConfig.yaml")
+
+	// directory location can be defined in the apkctl config file
+	err = ioutil.WriteFile(desFilePath, file, 0644)
+	if err != nil {
+		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
+	}
+
+	createConfigMap(filePath, dirPath, namespace)
+
+	args := []string{k8sUtils.K8sApply, k8sUtils.FilenameFlag, filepath.Join(dirPath, "")}
+
+	err = k8sUtils.ExecuteCommand(k8sUtils.Kubectl, args...)
+	if err != nil {
+		utils.HandleErrorAndExit("Error Deploying the API", err)
+	}
+	os.RemoveAll(dirPath)
+
+	fmt.Println("Successfully deployed API " + apiName)
+}
+
+func handleDryRun(file []byte, filePath, namespace, apiName string) {
+	var err error
+	dirPath, err = utils.GetAPKCTLHomeDir()
+	if err != nil {
+		utils.HandleErrorAndExit("Error getting apkctl home directory", err)
+	}
+
+	dirPath = path.Join(dirPath, utils.APIProjectsDir, apiName)
+
+	os.MkdirAll(dirPath, os.ModePerm)
+
+	desFilePath = filepath.Join(dirPath, "HTTPRouteConfig.yaml")
+
+	// directory location can be defined in the apkctl config file
+	err = ioutil.WriteFile(desFilePath, file, 0644)
+
+	if err != nil {
+		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
+	}
+
+	createConfigMap(filePath, dirPath, namespace)
+
+	fmt.Println("Successfully created API project with HttpRouteConfig and ConfigMap files!")
+	fmt.Println("API project directory: " + utils.APIProjectsDir + apiName)
 }
 
 func createConfigMap(filepath, dirPath, namespace string) {
