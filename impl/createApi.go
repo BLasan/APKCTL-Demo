@@ -34,6 +34,9 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+var dirPath string
+var desFilePath string
+
 func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) {
 	fmt.Println(filePath)
 	_, content, err := resolveYamlOrJSON(filePath)
@@ -157,29 +160,34 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		utils.HandleErrorAndExit("Error marshalling httproute file", err)
 	}
 
-	dirPath, err := utils.GetAPKCTLHomeDir()
-	if err != nil {
-		utils.HandleErrorAndExit("Error getting apkctl home directory", err)
-	}
-
-	dirPath = path.Join(dirPath, apiName)
-
-	os.MkdirAll(dirPath, os.ModePerm)
-
-	desFilePath := filepath.Join(dirPath, "HTTPRouteConfig.yaml")
-
-	// directory location can be defined in the apkctl config file
-	err = ioutil.WriteFile(desFilePath, file, 0644)
-
 	if err != nil {
 		utils.HandleErrorAndExit("Error writing httproute file", err)
 	}
 
-	createConfigMap(filePath, dirPath, namespace)
-
-	args := []string{"apply", "-f", filepath.Join(dirPath, "")}
-
 	if !isDryRun {
+		dirPath, err = os.MkdirTemp("", apiName)
+
+		if err != nil {
+			utils.HandleErrorAndExit("Error creating the temp directory", err)
+		}
+
+		fmt.Println(dirPath)
+
+		defer os.RemoveAll(dirPath)
+
+		desFilePath = filepath.Join(dirPath, "HTTPRouteConfig.yaml")
+
+		// directory location can be defined in the apkctl config file
+		err = ioutil.WriteFile(desFilePath, file, 0644)
+
+		if err != nil {
+			utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
+		}
+
+		createConfigMap(filePath, dirPath, namespace)
+
+		args := []string{"apply", "-f", filepath.Join(dirPath, "")}
+
 		err = k8sUtils.ExecuteCommand("kubectl", args...)
 		os.RemoveAll(dirPath)
 
@@ -189,6 +197,26 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 
 		fmt.Println("Successfully Deployed the API" + apiName + " on to the K8s Cluster")
 	} else {
+		dirPath, err = utils.GetAPKCTLHomeDir()
+		if err != nil {
+			utils.HandleErrorAndExit("Error getting apkctl home directory", err)
+		}
+
+		dirPath = path.Join(dirPath, apiName)
+
+		os.MkdirAll(dirPath, os.ModePerm)
+
+		desFilePath = filepath.Join(dirPath, "HTTPRouteConfig.yaml")
+
+		// directory location can be defined in the apkctl config file
+		err = ioutil.WriteFile(desFilePath, file, 0644)
+
+		if err != nil {
+			utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
+		}
+
+		createConfigMap(filePath, dirPath, namespace)
+
 		fmt.Println("Successfully Created " + apiName + " directory with HttpRouteConfig & ConfigMap files!")
 	}
 
