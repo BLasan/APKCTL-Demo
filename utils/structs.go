@@ -86,9 +86,6 @@ type ConfigMap struct {
 	Data       map[string]string `yaml:"data"`
 }
 
-type Data struct {
-}
-
 //  apiVersion: gateway.networking.k8s.io/v1beta1
 // kind: HTTPRoute
 // metadata:

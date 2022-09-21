@@ -21,6 +21,7 @@ package utils
 import (
 	"os"
 	"strings"
+	"text/template"
 
 	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
 )
@@ -105,4 +106,27 @@ func FindPathParam(array []string) string {
 	}
 
 	return ""
+}
+
+func createConfigMapFromTemplate(configmap ConfigMap, filepath string) {
+	t, err := template.New("APIConfigMap").Parse(configMapTemplate)
+
+	if err != nil {
+		HandleErrorAndExit("Error Parsing the template", err)
+	}
+
+	f, err := os.Create(filepath)
+
+	defer f.Close()
+
+	// var out bytes.Buffer
+
+	templ := template.Must(t, err)
+	// err = templ.Execute(&out, configmap)
+	err = templ.Execute(f, configmap)
+
+	if err != nil {
+		HandleErrorAndExit("Error executing the template", err)
+	}
+
 }

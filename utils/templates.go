@@ -10,4 +10,8 @@ metadata:
   {{end}}
 data:
 {{if ne .File ""}}
+swagger: {{.SwaggerContent}}
+{{else}}
+swagger: {{.DefaultSwagger}}
+{{end}}
 `
