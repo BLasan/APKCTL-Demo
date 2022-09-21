@@ -318,7 +318,7 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	}
 }
 
-// Deploy the
+// Handle API deploy
 func handleDeploy(file []byte, filePath, namespace, apiName string, configmap utils.ConfigMap) {
 	var err error
 	dirPath, err = os.MkdirTemp("", apiName)
@@ -350,6 +350,8 @@ func handleDeploy(file []byte, filePath, namespace, apiName string, configmap ut
 	fmt.Println("Successfully deployed API " + apiName + " into the " + namespace + " namespace")
 }
 
+// Handle the `Dry Run` option of create API command
+// This will generate an API project based on the provided command and flags
 func handleDryRun(file []byte, filePath, namespace, apiName string, configmap utils.ConfigMap) {
 	var err error
 	dirPath, err = utils.GetAPKCTLHomeDir()
