@@ -117,7 +117,7 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 		counter := 1
 
 		// path & path item
-		for path, _ := range swaggerSpec.Paths.Paths {
+		for path := range swaggerSpec.Paths.Paths {
 			// maximum 8 paths are allowed
 			if counter > 8 {
 				break
@@ -161,72 +161,19 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 
 	rule.BackendRefs = append(rule.BackendRefs, backendRef)
 	httpRoute.HttpRouteSpec.Rules = append(httpRoute.HttpRouteSpec.Rules, rule)
-
 	if err != nil {
 		utils.HandleErrorAndExit("Error extracting port number", err)
 	}
 
 	file, err := yaml.Marshal(&httpRoute)
-
 	if err != nil {
 		utils.HandleErrorAndExit("Error marshalling httproute file", err)
 	}
 
 	if !isDryRun {
-		dirPath, err = os.MkdirTemp("", apiName)
-
-		if err != nil {
-			utils.HandleErrorAndExit("Error creating the temp directory", err)
-		}
-
-		fmt.Println(dirPath)
-
-		defer os.RemoveAll(dirPath)
-
-		desFilePath = filepath.Join(dirPath, "HTTPRouteConfig.yaml")
-
-		// directory location can be defined in the apkctl config file
-		err = ioutil.WriteFile(desFilePath, file, 0644)
-
-		if err != nil {
-			utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
-		}
-
-		createConfigMap(filePath, dirPath, namespace)
-
-		args := []string{k8sUtils.K8sApply, k8sUtils.FilenameFlag, filepath.Join(dirPath, "")}
-
-		err = k8sUtils.ExecuteCommand(k8sUtils.Kubectl, args...)
-		os.RemoveAll(dirPath)
-
-		if err != nil {
-			utils.HandleErrorAndExit("Error Deploying the API", err)
-		}
-
-		fmt.Println("Successfully deployed API " + apiName)
+		handleDeploy(file, filePath, namespace, apiName)
 	} else {
-		dirPath, err = utils.GetAPKCTLHomeDir()
-		if err != nil {
-			utils.HandleErrorAndExit("Error getting apkctl home directory", err)
-		}
-
-		dirPath = path.Join(dirPath, utils.APIProjectsDir, apiName)
-
-		os.MkdirAll(dirPath, os.ModePerm)
-
-		desFilePath = filepath.Join(dirPath, "HTTPRouteConfig.yaml")
-
-		// directory location can be defined in the apkctl config file
-		err = ioutil.WriteFile(desFilePath, file, 0644)
-
-		if err != nil {
-			utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
-		}
-
-		createConfigMap(filePath, dirPath, namespace)
-
-		fmt.Println("Successfully created API project with HttpRouteConfig and ConfigMap files!")
-		fmt.Println("API project directory: " + utils.APIProjectsDir + apiName)
+		handleDryRun(file, filePath, namespace, apiName)
 	}
 }
 
@@ -335,15 +282,13 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	}
 }
 
+// Deploy the 
 func handleDeploy(file []byte, filePath, namespace, apiName string) {
 	var err error
 	dirPath, err = os.MkdirTemp("", apiName)
-
 	if err != nil {
 		utils.HandleErrorAndExit("Error creating the temp directory", err)
 	}
-
-	fmt.Println(dirPath)
 
 	defer os.RemoveAll(dirPath)
 
@@ -351,7 +296,6 @@ func handleDeploy(file []byte, filePath, namespace, apiName string) {
 
 	// directory location can be defined in the apkctl config file
 	err = ioutil.WriteFile(desFilePath, file, 0644)
-
 	if err != nil {
 		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
 	}
@@ -361,11 +305,10 @@ func handleDeploy(file []byte, filePath, namespace, apiName string) {
 	args := []string{k8sUtils.K8sApply, k8sUtils.FilenameFlag, filepath.Join(dirPath, "")}
 
 	err = k8sUtils.ExecuteCommand(k8sUtils.Kubectl, args...)
-	os.RemoveAll(dirPath)
-
 	if err != nil {
 		utils.HandleErrorAndExit("Error Deploying the API", err)
 	}
+	os.RemoveAll(dirPath)
 
 	fmt.Println("Successfully deployed API " + apiName)
 }
