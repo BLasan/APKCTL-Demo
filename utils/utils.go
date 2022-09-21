@@ -20,6 +20,7 @@ package utils
 
 import (
 	"os"
+	"path"
 	"strings"
 	"text/template"
 
@@ -108,14 +109,18 @@ func FindPathParam(array []string) string {
 	return ""
 }
 
-func createConfigMapFromTemplate(configmap ConfigMap, filepath string) {
+func CreateConfigMapFromTemplate(configmap ConfigMap, filepath string) {
 	t, err := template.New("APIConfigMap").Parse(configMapTemplate)
 
 	if err != nil {
 		HandleErrorAndExit("Error Parsing the template", err)
 	}
 
-	f, err := os.Create(filepath)
+	f, err := os.Create(path.Join(filepath, "APIConfigMap.yaml"))
+
+	if err != nil {
+		HandleErrorAndExit("Error creating configmap", err)
+	}
 
 	defer f.Close()
 

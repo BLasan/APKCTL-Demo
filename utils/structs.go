@@ -79,31 +79,16 @@ type BackendRef struct {
 	Weight    string `yaml:"weight,omitempty"`
 }
 
-type ConfigMap struct {
-	ApiVersion string            `yaml:"apiVersion"`
-	Kind       string            `yaml:"kind"`
-	MetaData   MetaData          `yaml:"metadata"`
-	Data       map[string]string `yaml:"data"`
-}
+// type ConfigMap struct {
+// 	ApiVersion string            `yaml:"apiVersion"`
+// 	Kind       string            `yaml:"kind"`
+// 	MetaData   MetaData          `yaml:"metadata"`
+// 	Data       map[string]string `yaml:"data"`
+// }
 
-//  apiVersion: gateway.networking.k8s.io/v1beta1
-// kind: HTTPRoute
-// metadata:
-//   name: bar-route
-// spec:
-//   parentRefs:
-//   - name: example-gateway
-//   hostnames:
-//   - "bar.example.com"
-//   rules:
-//   - matches:
-//     - headers:
-//       - type: Exact
-//         name: env
-//         value: canary
-//     backendRefs:
-//     - name: bar-svc-canary
-//       port: 8080
-//   - backendRefs:
-//     - name: bar-svc
-//       port: 8080
+type ConfigMap struct {
+	Name           string
+	Namespace      string
+	File           string
+	SwaggerContent string
+}

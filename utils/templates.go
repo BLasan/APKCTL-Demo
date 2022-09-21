@@ -1,17 +1,17 @@
 package utils
 
-var configMapTemplate = `
-apiVersion: v1
+var configMapTemplate = `apiVersion: v1
 kind: ConfigMap
 metadata:
   name: {{.Name}}
-  {{if ne .Namespace "" }}
+  {{if ne .Namespace "" -}}
   namespace: {{.Namespace}}
-  {{end}}
+  {{- end}}
 data:
-{{if ne .File ""}}
-swagger: {{.SwaggerContent}}
-{{else}}
-swagger: {{.DefaultSwagger}}
-{{end}}
-`
+	{{if ne .File "" -}}
+    swagger.yaml: |
+		{{.SwaggerContent}}
+	{{- else -}}
+	swagger: |
+		{{.DefaultSwagger}}
+	{{- end -}}`

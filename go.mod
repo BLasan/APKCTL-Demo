@@ -15,7 +15,7 @@ require (
 )
 
 require (
-	github.com/getkin/kin-openapi v0.102.0 // indirect
+	github.com/getkin/kin-openapi v0.103.0 // indirect
 	github.com/go-openapi/swag v0.19.15 // indirect
 	github.com/invopop/yaml v0.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
