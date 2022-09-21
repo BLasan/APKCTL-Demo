@@ -41,12 +41,21 @@ func UninstallPlatform() {
 	}
 
 	// Uninstall Envoy Gateway
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "-f", envoyGatewayInstallYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(
+		k8sUtils.Kubectl, k8sUtils.K8sDelete,
+		k8sUtils.FilenameFlag,
+		envoyGatewayInstallYaml,
+	); err != nil {
 		utils.HandleErrorAndExit("Error uninstalling Envoy Gateway", err)
 	}
 
 	// Uninstall Gateway API CRDs
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "-f", gatewayAPICRDsYaml); err != nil {
+	if err := k8sUtils.ExecuteCommand(
+		k8sUtils.Kubectl,
+		k8sUtils.K8sDelete,
+		k8sUtils.FilenameFlag,
+		gatewayAPICRDsYaml,
+	); err != nil {
 		utils.HandleErrorAndExit("Error uninstalling Gateway API CRDs", err)
 	}
 

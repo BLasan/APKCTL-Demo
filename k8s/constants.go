@@ -30,5 +30,6 @@ const K8sView = "view"
 
 const K8sHttpRoute = "httproute"
 
+const FilenameFlag = "-f"
 const MinifyFlag = "--minify"
 const OutputFormatFlag = "-o"
