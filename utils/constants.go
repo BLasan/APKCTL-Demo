@@ -26,6 +26,7 @@ const HttpRouteKind = "HTTPRoute"
 const PathPrefix = "PathPrefix"
 const ServiceKind = "Service"
 const APIProjectsDir = "/target/apis/"
+const SampleResources = "sample-resources"
 
 const DefaultNamespace = "default"
 
@@ -35,10 +36,11 @@ const K8sOutputWithCustomColumns = "custom-columns=" + APIColumnsOutput
 
 // Constants used for version identification of API definitions
 const (
-	Swagger      string = "swagger"
-	OpenAPI      string = "openapi"
-	Swagger2     string = "swagger_2"
-	OpenAPI3     string = "openapi_3"
-	NotDefined   string = "not_defined"
-	NotSupported string = "not_supported"
+	Swagger        string = "swagger"
+	OpenAPI        string = "openapi"
+	Swagger2       string = "swagger_2"
+	OpenAPI3       string = "openapi_3"
+	NotDefined     string = "not_defined"
+	NotSupported   string = "not_supported"
+	DefaultSwagger string = "swagger-default.yaml"
 )

@@ -79,16 +79,16 @@ type BackendRef struct {
 	Weight    string `yaml:"weight,omitempty"`
 }
 
-// type ConfigMap struct {
-// 	ApiVersion string            `yaml:"apiVersion"`
-// 	Kind       string            `yaml:"kind"`
-// 	MetaData   MetaData          `yaml:"metadata"`
-// 	Data       map[string]string `yaml:"data"`
-// }
-
 type ConfigMap struct {
-	Name           string
-	Namespace      string
-	File           string
-	SwaggerContent string
+	ApiVersion string            `yaml:"apiVersion"`
+	Kind       string            `yaml:"kind"`
+	MetaData   MetaData          `yaml:"metadata"`
+	Data       map[string]string `yaml:"data"`
 }
+
+// type ConfigMap struct {
+// 	Name           string
+// 	Namespace      string
+// 	File           string
+// 	SwaggerContent string
+// }
