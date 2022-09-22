@@ -122,8 +122,6 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 		serviceUrlArr = strings.Split(swaggerSpec.Host, ".")
 	}
 
-	fmt.Println("Service Array: ", serviceUrlArr)
-
 	// if swagger path is not defined do not iterate over it
 	if filePath == "" {
 		apiPath.Type = utils.PathPrefix
@@ -143,6 +141,10 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 			index := strings.IndexAny(path, "{")
 			if index >= 0 {
 				path = path[:index-1]
+			}
+
+			if strings.Contains(path, "/*") {
+				path = strings.ReplaceAll(path, "/*", "")
 			}
 
 			// append "/api/v3" to invoke the petstore apis
@@ -258,6 +260,11 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 				path = path[:index-1]
 			}
 
+			// remove *
+			if strings.Contains(path, "/*") {
+				path = strings.ReplaceAll(path, "/*", "")
+			}
+
 			// append "/api/v3" to invoke the petstore apis
 			path = "/api/v3" + path
 
@@ -340,7 +347,7 @@ func handleDeploy(file []byte, filePath, namespace, apiName string, configmap ut
 	}
 	os.RemoveAll(dirPath)
 
-	fmt.Println("Successfully deployed API " + apiName)
+	fmt.Println("Successfully deployed API " + apiName + " into the " + namespace + " namespace")
 }
 
 func handleDryRun(file []byte, filePath, namespace, apiName string, configmap utils.ConfigMap) {

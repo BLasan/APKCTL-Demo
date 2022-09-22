@@ -19,8 +19,6 @@
 package cmd
 
 import (
-	"fmt"
-
 	"github.com/BLasan/APKCTL-Demo/impl"
 	"github.com/BLasan/APKCTL-Demo/utils"
 	"github.com/spf13/cobra"
@@ -51,7 +49,6 @@ var CreateApiCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		// fmt.Println("API Name: ", args[0])
 		apiName := args[0]
-		fmt.Println("Is dry run: ", isDryRun)
 		handleCreateApi(apiName)
 	},
 }
