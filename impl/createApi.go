@@ -109,17 +109,21 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	var rule utils.Rule
 	var backendRef utils.BackendRef
 
-	var serviceUrlArr []string
-
-	if serviceUrl != "" {
-		if strings.Contains(serviceUrl, "http://") {
-			serviceUrl = strings.Replace(serviceUrl, "http://", "", 1)
-		} else {
-			serviceUrl = strings.Replace(serviceUrl, "https://", "", 1)
+	if serviceUrl == "" && swaggerSpec.Host != "" {
+		urlScheme := ""
+		for _, scheme := range swaggerSpec.Schemes {
+			if scheme == "https" {
+				urlScheme = utils.HttpsURLScheme
+				break
+			} else if scheme == "http" {
+				urlScheme = utils.HttpURLScheme
+			} else {
+				utils.HandleErrorAndExit("Detected scheme(s) within the swagger definition are not supported", nil)
+			}
 		}
-		serviceUrlArr = strings.Split(serviceUrl, ".")
-	} else if swaggerSpec.Host != "" {
-		serviceUrlArr = strings.Split(swaggerSpec.Host, ".")
+		serviceUrl = urlScheme + swaggerSpec.Host + swaggerSpec.BasePath
+	} else {
+		utils.HandleErrorAndExit("Unable to find a valid service URL.", nil)
 	}
 
 	// if swagger path is not defined do not iterate over it
@@ -173,10 +177,22 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 
 	backendRef.Kind = utils.ServiceKind
 
-	backendRef.Name = serviceUrlArr[0]
+	parsedURL, err := url.ParseRequestURI(serviceUrl)
+	if err != nil {
+		utils.HandleErrorAndExit("Error while parsing the service URL.", err)
+	}
+
+	backendRef.Name = strings.Split(parsedURL.Host, ".")[0]
 	// backendRef.Namespace = serviceUrlArr[1]
-	var err error
-	backendRef.Port, err = strconv.Atoi(strings.Split(serviceUrlArr[len(serviceUrlArr)-1], ":")[1])
+	if parsedURL.Port() != "" {
+		u32, err := strconv.ParseUint(parsedURL.Port(), 10, 32)
+		if err != nil {
+			fmt.Println("Endpoint port is not in the expected format.", err)
+		}
+		backendRef.Port = int(uint32(u32))
+	} else {
+		backendRef.Port = int(uint32(80))
+	}
 
 	rule.BackendRefs = append(rule.BackendRefs, backendRef)
 	httpRoute.HttpRouteSpec.Rules = append(httpRoute.HttpRouteSpec.Rules, rule)
@@ -228,15 +244,13 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	var rule utils.Rule
 	var backendRef utils.BackendRef
 
-	var serviceUrlArr []string
-
-	if serviceUrl != "" {
-		serviceUrlArr = strings.Split(serviceUrl, ".")
-	} else {
+	if serviceUrl == "" {
+		var serviceUrls []string
 		for _, serverEntry := range openAPISpec.Servers {
-			serviceUrlArr = append(serviceUrlArr, serverEntry.URL)
+			serviceUrls = append(serviceUrls, serverEntry.URL)
 		}
-		// serviceUrlArr = append(serviceUrlArr, openAPISpec.Servers[0].URL)
+		// We will use the first URL provided under the servers object
+		serviceUrl = serviceUrls[0]
 	}
 
 	// if swagger path is not defined do not iterate over it
@@ -280,8 +294,7 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 
 	backendRef.Kind = utils.ServiceKind
 
-	// backendRef.Namespace = serviceUrlArr[1]
-	parsedURL, err := url.ParseRequestURI(serviceUrlArr[0])
+	parsedURL, err := url.ParseRequestURI(serviceUrl)
 	if err != nil {
 		utils.HandleErrorAndExit("Error while parsing the service URL.", err)
 	}
@@ -318,7 +331,7 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	}
 }
 
-// Deploy the
+// Handle API deploy
 func handleDeploy(file []byte, filePath, namespace, apiName string, configmap utils.ConfigMap) {
 	var err error
 	dirPath, err = os.MkdirTemp("", apiName)
@@ -350,6 +363,8 @@ func handleDeploy(file []byte, filePath, namespace, apiName string, configmap ut
 	fmt.Println("Successfully deployed API " + apiName + " into the " + namespace + " namespace")
 }
 
+// Handle the `Dry Run` option of create API command
+// This will generate an API project based on the provided command and flags
 func handleDryRun(file []byte, filePath, namespace, apiName string, configmap utils.ConfigMap) {
 	var err error
 	dirPath, err = utils.GetAPKCTLHomeDir()

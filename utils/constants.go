@@ -34,7 +34,7 @@ const DefaultNamespace = "default"
 const APIColumnsOutput = "NAME:.metadata.name,VERSION:.metadata.labels.version,HOSTNAMES:.spec.hostnames"
 const K8sOutputWithCustomColumns = "custom-columns=" + APIColumnsOutput
 
-// Constants used for version identification of API definitions
+// Constants used for API definition file processing
 const (
 	Swagger        string = "swagger"
 	OpenAPI        string = "openapi"
@@ -43,4 +43,6 @@ const (
 	NotDefined     string = "not_defined"
 	NotSupported   string = "not_supported"
 	DefaultSwagger string = "swagger-default.yaml"
+	HttpURLScheme  string = "http://"
+	HttpsURLScheme string = "https://"
 )
