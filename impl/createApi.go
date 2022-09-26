@@ -71,6 +71,12 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		if err != nil {
 			utils.HandleErrorAndExit("Error unmarshalling swagger", err)
 		}
+
+		// If version is not provided as a flag, use the version from the Swagger file
+		if version == "" {
+			version = swaggerSpec.Info.Version
+		}
+
 		// updateSwaggerUrl(&swaggerSpec, serviceUrl)
 		createAndDeploySwaggerAPI(swaggerSpec, filePath, namespace, serviceUrl, apiName, version, isDryRun)
 
@@ -82,6 +88,13 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		if err != nil {
 			utils.HandleErrorAndExit("Error unmarshalling OpenAPI Definition", err)
 		}
+
+		// If version is not provided as a flag, use the version from the OpenAPI Definition file
+		if version == "" {
+			version = openAPISpec.Info.Version
+		}
+
+		// updateOpenAPIDefWithServerUrl(&openAPISpec, serviceUrl)
 		createAndDeployOpenAPI(openAPISpec, filePath, namespace, serviceUrl, apiName, version, isDryRun)
 
 	} else {
@@ -102,14 +115,8 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	// httpRoute.MetaData.Namespace = namespace
 
 	labels := make(map[string]string)
-
-	if version == "" {
-		labels["version"] = swaggerSpec.Info.Version
-		httpRoute.MetaData.Labels = labels
-	} else {
-		labels["version"] = version
-		httpRoute.MetaData.Labels = labels
-	}
+	labels["version"] = version
+	httpRoute.MetaData.Labels = labels
 
 	var apiPath utils.Path
 	var match utils.Match
@@ -220,9 +227,9 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	// configmap.SwaggerContent = readSwaggerDef(filePath)
 
 	if !isDryRun {
-		handleDeploy(file, filePath, namespace, apiName, configmap)
+		handleDeploy(file, filePath, namespace, apiName, version, configmap)
 	} else {
-		handleDryRun(file, filePath, namespace, apiName, configmap)
+		handleDryRun(file, filePath, namespace, apiName, version, configmap)
 	}
 }
 
@@ -238,14 +245,8 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	httpRoute.MetaData.Name = apiName
 
 	labels := make(map[string]string)
-
-	if version == "" {
-		labels["version"] = openAPISpec.Info.Version
-		httpRoute.MetaData.Labels = labels
-	} else {
-		labels["version"] = version
-		httpRoute.MetaData.Labels = labels
-	}
+	labels["version"] = version
+	httpRoute.MetaData.Labels = labels
 
 	var apiPath utils.Path
 	var match utils.Match
@@ -334,16 +335,17 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	// configmap.SwaggerContent = readSwaggerDef(filePath)
 
 	if !isDryRun {
-		handleDeploy(file, filePath, namespace, apiName, configmap)
+		handleDeploy(file, filePath, namespace, apiName, version, configmap)
 	} else {
-		handleDryRun(file, filePath, namespace, apiName, configmap)
+		handleDryRun(file, filePath, namespace, apiName, version, configmap)
 	}
 }
 
 // Handle API deploy
-func handleDeploy(file []byte, filePath, namespace, apiName string, configmap utils.ConfigMap) {
+func handleDeploy(file []byte, filePath, namespace, apiName, version string, configmap utils.ConfigMap) {
 	var err error
-	dirPath, err = os.MkdirTemp("", apiName)
+	apiProjectDirName := apiName + "_" + version
+	dirPath, err = os.MkdirTemp("", apiProjectDirName)
 	if err != nil {
 		utils.HandleErrorAndExit("Error creating the temp directory", err)
 	}
@@ -374,14 +376,15 @@ func handleDeploy(file []byte, filePath, namespace, apiName string, configmap ut
 
 // Handle the `Dry Run` option of create API command
 // This will generate an API project based on the provided command and flags
-func handleDryRun(file []byte, filePath, namespace, apiName string, configmap utils.ConfigMap) {
+func handleDryRun(file []byte, filePath, namespace, apiName, version string, configmap utils.ConfigMap) {
 	var err error
 	dirPath, err = utils.GetAPKCTLHomeDir()
 	if err != nil {
 		utils.HandleErrorAndExit("Error getting apkctl home directory", err)
 	}
 
-	dirPath = path.Join(dirPath, utils.APIProjectsDir, apiName)
+	apiProjectDirName := apiName + "_" + version
+	dirPath = path.Join(dirPath, utils.APIProjectsDir, apiProjectDirName)
 
 	os.MkdirAll(dirPath, os.ModePerm)
 
