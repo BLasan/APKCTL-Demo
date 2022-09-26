@@ -42,6 +42,7 @@ var desFilePath string
 
 func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) {
 
+	// Checking if path to API definition is provided. If not specified, use the default OpenAPI definition
 	if filePath == "" {
 		dir, err := utils.GetAPKCTLHomeDir()
 		if err != nil {
@@ -63,6 +64,8 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	definitionVersion := utils.FindAPIDefinitionVersion(definitionJsn)
 
 	if definitionVersion == utils.Swagger2 {
+
+		// API definition is a Swagger file
 		var swaggerSpec spec.Swagger
 		err = json.Unmarshal(definitionJsn, &swaggerSpec)
 		if err != nil {
@@ -70,13 +73,17 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 		}
 		// updateSwaggerUrl(&swaggerSpec, serviceUrl)
 		createAndDeploySwaggerAPI(swaggerSpec, filePath, namespace, serviceUrl, apiName, version, isDryRun)
+
 	} else if definitionVersion == utils.OpenAPI3 {
+
+		// API definition is an OpenAPI Definition file
 		var openAPISpec openapi3.T
 		err = json.Unmarshal(definitionJsn, &openAPISpec)
 		if err != nil {
 			utils.HandleErrorAndExit("Error unmarshalling OpenAPI Definition", err)
 		}
 		createAndDeployOpenAPI(openAPISpec, filePath, namespace, serviceUrl, apiName, version, isDryRun)
+
 	} else {
 		utils.HandleErrorAndExit("Error resolving API definition. Provided file kind is not supported or not acceptable.", nil)
 	}
@@ -109,24 +116,27 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	var rule utils.Rule
 	var backendRef utils.BackendRef
 
-	if serviceUrl == "" && swaggerSpec.Host != "" {
-		urlScheme := ""
-		for _, scheme := range swaggerSpec.Schemes {
-			if scheme == "https" {
-				urlScheme = utils.HttpsURLScheme
-				break
-			} else if scheme == "http" {
-				urlScheme = utils.HttpURLScheme
-			} else {
-				utils.HandleErrorAndExit("Detected scheme(s) within the swagger definition are not supported", nil)
+	// Checking if service URL is provided. If not specified, deduce the service URL using the swagger definition
+	if serviceUrl == "" {
+		if swaggerSpec.Host != "" {
+			urlScheme := ""
+			for _, scheme := range swaggerSpec.Schemes {
+				if scheme == "https" {
+					urlScheme = utils.HttpsURLScheme
+					break
+				} else if scheme == "http" {
+					urlScheme = utils.HttpURLScheme
+				} else {
+					utils.HandleErrorAndExit("Detected scheme(s) within the swagger definition are not supported", nil)
+				}
 			}
+			serviceUrl = urlScheme + swaggerSpec.Host + swaggerSpec.BasePath
+		} else {
+			utils.HandleErrorAndExit("Unable to find a valid service URL.", nil)
 		}
-		serviceUrl = urlScheme + swaggerSpec.Host + swaggerSpec.BasePath
-	} else {
-		utils.HandleErrorAndExit("Unable to find a valid service URL.", nil)
 	}
 
-	// if swagger path is not defined do not iterate over it
+	// If API definition is not specified, provide the wildcard resource as a PathPrefix
 	if filePath == "" {
 		apiPath.Type = utils.PathPrefix
 		apiPath.Value = "/"
@@ -153,8 +163,6 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 
 			// append "/api/v3" to invoke the petstore apis
 			path = "/api/v3" + path
-
-			// fmt.Println("Path: ", path)
 
 			// pathArr := strings.Split(path, "/")
 			// sort.Strings(pathArr)
@@ -244,6 +252,7 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	var rule utils.Rule
 	var backendRef utils.BackendRef
 
+	// Checking if service URL is provided. If not specified, use the service URLs provided under the OpenAPI definition
 	if serviceUrl == "" {
 		var serviceUrls []string
 		for _, serverEntry := range openAPISpec.Servers {
@@ -253,7 +262,7 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 		serviceUrl = serviceUrls[0]
 	}
 
-	// if swagger path is not defined do not iterate over it
+	// If API definition is not specified, provide the wildcard resource as a PathPrefix
 	if filePath == "" {
 		apiPath.Type = utils.PathPrefix
 		apiPath.Value = "/"
@@ -360,7 +369,7 @@ func handleDeploy(file []byte, filePath, namespace, apiName string, configmap ut
 	}
 	os.RemoveAll(dirPath)
 
-	fmt.Println("Successfully deployed API " + apiName + " into the " + namespace + " namespace")
+	fmt.Println("\nSuccessfully deployed " + apiName + " API into the " + namespace + " namespace")
 }
 
 // Handle the `Dry Run` option of create API command
