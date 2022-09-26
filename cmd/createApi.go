@@ -47,7 +47,6 @@ var CreateApiCmd = &cobra.Command{
 	Long:    CreateCAPImdLongDesc,
 	Example: createAPICmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("API Name: ", args[0])
 		apiName := args[0]
 		handleCreateApi(apiName)
 	},

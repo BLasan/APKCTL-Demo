@@ -31,5 +31,5 @@ func DeleteAPI(namespace, apiName string) {
 		utils.HandleErrorAndExit("Error executing K8s command", err)
 	}
 
-	fmt.Println("Successfully deleted " + apiName + " from " + namespace)
+	fmt.Println("\nSuccessfully deleted " + apiName + " API from " + namespace + " namespace")
 }
