@@ -26,9 +26,19 @@ import (
 )
 
 func DeleteAPI(namespace, apiName string) {
+	var errMsg string
 	resource := k8sUtils.K8sHttpRoute + "/" + apiName
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, resource, "-n", namespace); err != nil {
-		utils.HandleErrorAndExit("Error executing K8s command", err)
+
+	// Execute kubernetes command to delete API
+	if deleteApiErr := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, resource, "-n", namespace); deleteApiErr != nil {
+		if namespace != "" {
+			errMsg = fmt.Sprintf("\nCould not find the API \"%s\" in the \"%s\" namespace\n",
+				apiName, namespace)
+		} else {
+			errMsg = fmt.Sprintf("\nCould not find the API \"%s\"\n", apiName)
+		}
+		fmt.Println(errMsg)
+		utils.HandleErrorAndExit("Error executing K8s command ", nil)
 	}
 
 	fmt.Println("\nSuccessfully deleted " + apiName + " API from " + namespace + " namespace")
