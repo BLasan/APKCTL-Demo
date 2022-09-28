@@ -143,6 +143,12 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 		}
 	}
 
+	parsedURL, err := url.ParseRequestURI(serviceUrl)
+	if err != nil {
+		utils.HandleErrorAndExit("Error while parsing the service URL.", err)
+	}
+	basePath := parsedURL.Path
+
 	// If API definition is not specified, provide the wildcard resource as a PathPrefix
 	if filePath == "" {
 		apiPath.Type = utils.PathPrefix
@@ -168,9 +174,11 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 				path = strings.ReplaceAll(path, "/*", "")
 			}
 
-			// append "/api/v3" to invoke the petstore apis
-			path = "/api/v3" + path
-
+			path = basePath + path
+			if path == "" {
+				path = "/"
+			}
+			
 			// pathArr := strings.Split(path, "/")
 			// sort.Strings(pathArr)
 			// path = utils.FindPathParam(pathArr)
@@ -191,12 +199,6 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	}
 
 	backendRef.Kind = utils.ServiceKind
-
-	parsedURL, err := url.ParseRequestURI(serviceUrl)
-	if err != nil {
-		utils.HandleErrorAndExit("Error while parsing the service URL.", err)
-	}
-
 	backendRef.Name = strings.Split(parsedURL.Host, ".")[0]
 	// backendRef.Namespace = serviceUrlArr[1]
 	if parsedURL.Port() != "" {
@@ -263,6 +265,12 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 		serviceUrl = serviceUrls[0]
 	}
 
+	parsedURL, err := url.ParseRequestURI(serviceUrl)
+	if err != nil {
+		utils.HandleErrorAndExit("Error while parsing the service URL.", err)
+	}
+	basePath := parsedURL.Path
+
 	// If API definition is not specified, provide the wildcard resource as a PathPrefix
 	if filePath == "" {
 		apiPath.Type = utils.PathPrefix
@@ -289,8 +297,10 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 				path = strings.ReplaceAll(path, "/*", "")
 			}
 
-			// append "/api/v3" to invoke the petstore apis
-			path = "/api/v3" + path
+			path = basePath + path
+			if path == "" {
+				path = "/"
+			}
 
 			apiPath.Type = utils.PathPrefix
 			apiPath.Value = path
@@ -303,12 +313,6 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	}
 
 	backendRef.Kind = utils.ServiceKind
-
-	parsedURL, err := url.ParseRequestURI(serviceUrl)
-	if err != nil {
-		utils.HandleErrorAndExit("Error while parsing the service URL.", err)
-	}
-
 	backendRef.Name = strings.Split(parsedURL.Host, ".")[0]
 	if parsedURL.Port() != "" {
 		u32, err := strconv.ParseUint(parsedURL.Port(), 10, 32)
