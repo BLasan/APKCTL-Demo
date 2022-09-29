@@ -86,6 +86,12 @@ type ConfigMap struct {
 	Data       map[string]string `yaml:"data"`
 }
 
+type SwaggerInfo struct {
+	Description string `yaml:"description"`
+	Version     string `yaml:"version"`
+	Title       string `yaml:"title"`
+}
+
 // type ConfigMap struct {
 // 	Name           string
 // 	Namespace      string
