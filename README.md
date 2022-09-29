@@ -3,12 +3,10 @@
 Command Line Tool for APK, API Management Platform for Kubernetes to address the evergrowing industrial need to have a native experience when it comes to API Management in Kubernetes.
 
 ## Getting Started 
-<hr>
 
 To get started with APKCTL, you will need to have the prerequisites listed below. Once, that's sorted out you are good to use APKCTL.
 
 ### Prerequisites
-<hr>
 
 1. Make sure you have [Rancher Desktop](https://rancherdesktop.io/), [Minikube](https://minikube.sigs.k8s.io/docs/start/) or any other container orchestration platform installed in your machine.
 
@@ -21,7 +19,7 @@ To get started with APKCTL, you will need to have the prerequisites listed below
 - **Dockerd** is used as the container runtime (If your using Rancher,  you can verify the container runtime by navigating to Preferences -> Container Runtime 
 
 ### Clone and Setup APKCTL
-<hr>
+
 
 - Fork and clone/directly clone [this repo](https://github.com/BLasan/APKCTL-Demo).
 
@@ -40,49 +38,49 @@ To get started with APKCTL, you will need to have the prerequisites listed below
 ```./apkctl install platform```
 
 ### API Create and Deploy using API Definition
-<hr>
+
 
 Use the following command to create an API using the sample [petstore swagger](https://github.com/BLasan/APKCTL-Demo/blob/main/sample-resources/swagger.yaml) and deploy to a particular namespace (deployed to default namespace if not provided).
 
 ```./apkctl create api swaggertest -f sample-resources/swagger.yaml --version 1.0.0 -n default```
 
 ### API Create and Deploy using Service URL
-<hr>
+
 
 Use the following command to create an API using the service URL (note that an API definition need not be provided for this scenario).
 
 ```./apkctl create api serviceurltest --service-url http://httpbin.default.svc.cluster.local:80```
 
 ### Invoking the Deployed API
-<hr>
+
 
 Once the deployment is succesful, you can try out the deployed API. First, look for the external IP of the gateway service (execute `kubectl get all --all-namespaces` command and look for the external IP of the service with name envoy-eg). Then invoke the API using the external IP as shown below.
 
 ```curl --verbose --header "Host: www.example.com" http://<EXTERNAL-IP>:8080/api/v3/pet/3```
 
 ### API Create Command with Dry Run Option
-<hr>
+
 
 You can use the API create command with  `--dry-run` option to generate the API project and store it in your file system. Note that the API does not get deployed with this command.
 
 ```./apkctl create api swaggertest -f sample-resources/swagger.yaml --version 1.0.0 -n default --dry-run```
 
 ### API Delete
-<hr>
+
 
 Use the following command to delete an API.
 
 ```./apkctl delete api swaggertest```
 
 ### Get APIs
-<hr>
+
 
 You can list down the APIs that are deployed using the below command.
 
 ```./apkctl get apis -n default```
 
 ### Clean up
-<hr>
+
 
 Clean up by executing the following commands once you are done.
 
@@ -95,7 +93,7 @@ Clean up by executing the following commands once you are done.
 ```./apkctl uninstall platform ```
 
 ## List of Commands
-<hr>
+
 
 - apkctl install platform
 - apkctl create api \<API Name\> --version \<API Version\> -n \<Namespace\> -f \<API Definition File\> --service-url \<Service URL\> --dry-run
