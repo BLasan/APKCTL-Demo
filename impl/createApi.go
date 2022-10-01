@@ -214,7 +214,7 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 			if path == "" {
 				path = "/"
 			}
-			
+
 			// pathArr := strings.Split(path, "/")
 			// sort.Strings(pathArr)
 			// path = utils.FindPathParam(pathArr)
@@ -264,9 +264,9 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	// configmap.SwaggerContent = readSwaggerDef(filePath)
 
 	if !isDryRun {
-		handleDeploy(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec)
+		handleDeploy(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec, utils.Swagger2)
 	} else {
-		handleDryRun(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec)
+		handleDryRun(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec, utils.Swagger2)
 	}
 }
 
@@ -375,14 +375,14 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	version := openAPISpec.Info.Version
 
 	if !isDryRun {
-		handleDeploy(file, filePath, namespace, apiName, version, openAPISpec)
+		handleDeploy(file, filePath, namespace, apiName, version, openAPISpec, utils.OpenAPI3)
 	} else {
-		handleDryRun(file, filePath, namespace, apiName, version, openAPISpec)
+		handleDryRun(file, filePath, namespace, apiName, version, openAPISpec, utils.OpenAPI3)
 	}
 }
 
 // Handle API deploy
-func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}) {
+func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}, swaggerVersion string) {
 	var err error
 	apiProjectDirName := apiName + "_" + version
 	dirPath, err = os.MkdirTemp("", apiProjectDirName)
@@ -400,7 +400,7 @@ func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version stri
 		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
 	}
 
-	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition)
+	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion)
 	// utils.CreateConfigMapFromTemplate(configmap, dirPath)
 
 	args := []string{k8sUtils.K8sApply, k8sUtils.FilenameFlag, filepath.Join(dirPath, "")}
@@ -416,7 +416,7 @@ func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version stri
 
 // Handle the `Dry Run` option of create API command
 // This will generate an API project based on the provided command and flags
-func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}) {
+func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}, swaggerVersion string) {
 	var err error
 	dirPath, err = utils.GetAPKCTLHomeDir()
 	if err != nil {
@@ -437,14 +437,14 @@ func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version stri
 		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
 	}
 
-	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition)
+	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, utils.OpenAPI3)
 	// utils.CreateConfigMapFromTemplate(configmap, dirPath)
 
 	fmt.Println("Successfully created API project with HttpRouteConfig and ConfigMap files!")
 	fmt.Println("API project directory: " + utils.APIProjectsDir + apiName)
 }
 
-func createConfigMap(ext, dirPath, namespace, apiname string, definition interface{}) {
+func createConfigMap(ext, dirPath, namespace, apiname string, definition interface{}, swaggerVersion string) {
 	configmap := utils.ConfigMap{}
 	configmap.ApiVersion = "v1"
 	configmap.Kind = "ConfigMap"
@@ -468,13 +468,21 @@ func createConfigMap(ext, dirPath, namespace, apiname string, definition interfa
 		if err != nil {
 			utils.HandleErrorAndExit("Error while Marshalling the YAML ", err)
 		}
-		data["swagger.yaml"] = string(content)
+		if swaggerVersion == utils.Swagger2 {
+			data["swagger.yaml"] = string(content)
+		} else if swaggerVersion == utils.OpenAPI3 {
+			data["openapi.yaml"] = string(content)
+		}
 	} else if ext == ".json" {
 		content, err := json.Marshal(definition)
 		if err != nil {
 			utils.HandleErrorAndExit("Error while Marshalling the JSON ", err)
 		}
-		data["swagger.json"] = string(content)
+		if swaggerVersion == utils.Swagger2 {
+			data["swagger.json"] = string(content)
+		} else if swaggerVersion == utils.OpenAPI3 {
+			data["openapi.json"] = string(content)
+		}
 	}
 
 	configmap.Data = data
