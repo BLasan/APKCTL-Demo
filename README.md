@@ -60,7 +60,7 @@ Once the deployment is succesful, you can try out the deployed API. First, look 
 
 If you're using minikube, run `minikube tunnel` in a separate terminal window to receive an external IP for the service.
 
-```curl --verbose --header "Host: www.example.com" http://<EXTERNAL-IP>:8080/api/v3/pet/3```
+```curl --verbose --header "Host: www.apk.com" http://<EXTERNAL-IP>:8080/api/v3/pet/3```
 
 ### API Create Command with Dry Run Option
 
