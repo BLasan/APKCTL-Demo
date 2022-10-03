@@ -29,9 +29,11 @@ To get started with APKCTL, you will need to have the prerequisites listed below
 
 ```go build apkctl.go```
 
-- In order to try out the basic scenarios within APKCTL, you’ll need to deploy a sample service. You can simply deploy a sample service by executing the following command.
+- In order to try out the basic scenarios within APKCTL, you’ll need to deploy a sample service. You can simply deploy a sample service by executing the following command with the necessary Deployment & Service configurations included. To build the petstore image, refer to the [Swagger README](https://github.com/swagger-api/swagger-petstore).
 
 ```kubectl apply -f sample-resources/BackendService.yaml```
+
+We have considered the swagger-petstore repository to build the docker image. To build the docker image locally, try following steps.
 
 - Command to install the platform.
 
@@ -55,6 +57,8 @@ Use the following command to create an API using the service URL (note that an A
 
 
 Once the deployment is succesful, you can try out the deployed API. First, look for the external IP of the gateway service (execute `kubectl get all --all-namespaces` command and look for the external IP of the service with name envoy-eg). Then invoke the API using the external IP as shown below.
+
+If you're using minikube, run `minikube tunnel` in a separate terminal window to receive an external IP for the service.
 
 ```curl --verbose --header "Host: www.example.com" http://<EXTERNAL-IP>:8080/api/v3/pet/3```
 
