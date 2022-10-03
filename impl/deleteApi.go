@@ -25,9 +25,9 @@ import (
 	"github.com/BLasan/APKCTL-Demo/utils"
 )
 
-func DeleteAPI(namespace, apiName string) {
+func DeleteAPI(namespace, apiName, version string) {
 	var errMsg string
-	resource := k8sUtils.K8sHttpRoute + "/" + apiName
+	resource := k8sUtils.K8sHttpRoute + "/" + apiName + "-" + version
 
 	// Execute kubernetes command to delete API
 	if deleteApiErr := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, resource, "-n", namespace); deleteApiErr != nil {

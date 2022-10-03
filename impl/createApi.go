@@ -147,7 +147,7 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	httpRoute.HttpRouteSpec.HostNames = append(httpRoute.HttpRouteSpec.HostNames, "www.apk.com")
 	parentRef.Name = "eg"
 	httpRoute.HttpRouteSpec.ParentRefs = append(httpRoute.HttpRouteSpec.ParentRefs, parentRef)
-	httpRoute.MetaData.Name = swaggerSpec.Info.Title
+	httpRoute.MetaData.Name = swaggerSpec.Info.Title + "-" + swaggerSpec.Info.Version
 	// httpRoute.MetaData.Namespace = namespace
 
 	labels := make(map[string]string)
@@ -279,7 +279,7 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	httpRoute.HttpRouteSpec.HostNames = append(httpRoute.HttpRouteSpec.HostNames, "www.apk.com")
 	parentRef.Name = "eg"
 	httpRoute.HttpRouteSpec.ParentRefs = append(httpRoute.HttpRouteSpec.ParentRefs, parentRef)
-	httpRoute.MetaData.Name = apiName
+	httpRoute.MetaData.Name = apiName + "-" + openAPISpec.Info.Version
 
 	labels := make(map[string]string)
 	labels["version"] = openAPISpec.Info.Version

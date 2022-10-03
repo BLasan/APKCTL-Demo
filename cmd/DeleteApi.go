@@ -49,11 +49,13 @@ func handleDeleteApi(apiName string) {
 	if dpNamespace == "" {
 		dpNamespace = utils.DefaultNamespace
 	}
-	impl.DeleteAPI(dpNamespace, apiName)
+	impl.DeleteAPI(dpNamespace, apiName, version)
 }
 
 func init() {
 	DeleteCmd.AddCommand(DeleteApiCmd)
 	DeleteApiCmd.Flags().StringVarP(&dpNamespace, "namespace", "n", "", "Namespace of the API")
 	DeleteApiCmd.Flags().StringVarP(&version, "version", "", "", "Version of the API")
+
+	_ = DeleteApiCmd.MarkFlagRequired("version")
 }
