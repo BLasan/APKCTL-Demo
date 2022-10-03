@@ -74,7 +74,7 @@ You can use the API create command with  `--dry-run` option to generate the API 
 
 Use the following command to delete an API.
 
-```./apkctl delete api swaggertest```
+```./apkctl delete api swaggertest --version 1.0.0```
 
 ### Get APIs
 

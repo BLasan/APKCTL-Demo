@@ -384,7 +384,7 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 // Handle API deploy
 func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}, swaggerVersion string) {
 	var err error
-	apiProjectDirName := apiName + "_" + version
+	apiProjectDirName := apiName + "-" + version
 	dirPath, err = os.MkdirTemp("", apiProjectDirName)
 	if err != nil {
 		utils.HandleErrorAndExit("Error creating the temp directory", err)
@@ -423,7 +423,7 @@ func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version stri
 		utils.HandleErrorAndExit("Error getting apkctl home directory", err)
 	}
 
-	apiProjectDirName := apiName + "_" + version
+	apiProjectDirName := apiName + "-" + version
 	dirPath = path.Join(dirPath, utils.APIProjectsDir, apiProjectDirName)
 
 	os.MkdirAll(dirPath, os.ModePerm)
