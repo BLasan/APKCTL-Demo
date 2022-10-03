@@ -24,16 +24,16 @@ import (
 )
 
 const DeleteCmdLiteral = "delete"
-const DeleteCmdShortDesc = "Delete API and Deploy"
-const DeleteCmdLongDesc = `Delete new API and Deploy onto the Kubernetes Cluster`
-const DeleteCmdExamples = utils.ProjectName + ` ` + DeleteCmdLiteral + ` ` + DeleteAPICmdLiteral + ` petstore \
-	--namespace  https://localhost:9443 -v 1.0.0
+const DeleteCmdShortDesc = "Delete API"
+const DeleteCmdLongDesc = `Delete API from Kubernetes Cluster`
+const DeleteCmdExamples = utils.ProjectName + ` ` + DeleteCmdLiteral + ` ` + DeleteAPICmdLiteral + ` petstore --version 1.0.0 -n wso2
 	
-	NOTE: The flag --environment (-e) is mandatory.
-	You can either provide only the flag --apim , or all the other 4 flags (--registration --publisher --devportal --admin) without providing --apim flag.
-	If you are omitting any of --registration --publisher --devportal --admin flags, you need to specify --apim flag with the API Manager endpoint. In both of the
-	cases --token flag is optional and use it to specify the gateway token endpoint. This will be used for "apictl get-keys" operation.
-	To add a micro integrator instance to an environment you can use the --mi flag.`
+NOTE: The flag --version (-v) is mandatory.
+You can optionally provide the --namespace (-n) flag to specify the namespace of the deployed API that you wish to delete.
+
+The API to be deleted is identified using the API name and version.
+Optionally, you can specify the namespace that the API resides in.
+If the API does not exist, an error is thrown.`
 
 // DeleteCmd represents the Delete command
 var DeleteCmd = &cobra.Command{
@@ -42,7 +42,3 @@ var DeleteCmd = &cobra.Command{
 	Long:    DeleteCmdLongDesc,
 	Example: DeleteCmdExamples,
 }
-
-// func init() {
-// 	RootCmd.AddCommand(DeleteCmd)
-// }

@@ -26,12 +26,7 @@ import (
 
 const InstallPlatformCmdLiteral = "install platform"
 const InstallPlatformCmdShortDesc = "Install APIM Control Plane component(s) and Data Plane component(s)"
-const InstallPlatformCmdLongDesc = `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`
+const InstallPlatformCmdLongDesc = `Install APIM Control Plane component(s) and Data Plane component(s)`
 const InstallPlatformCmdExamples = utils.ProjectName + ` ` + InstallPlatformCmdLiteral
 
 // InstallPlatformCmd represents the APKCTL platform installation command

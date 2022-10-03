@@ -26,12 +26,7 @@ import (
 
 const UninstallPlatformCmdLiteral = "uninstall platform"
 const UninstallPlatformCmdShortDesc = "Uninstall APIM Control Plane component(s) and Data Plane component(s)"
-const UninstallPlatformCmdLongDesc = `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`
+const UninstallPlatformCmdLongDesc = `Uninstall APIM Control Plane component(s) and Data Plane component(s)`
 const UninstallPlatformCmdExamples = utils.ProjectName + ` ` + UninstallPlatformCmdLiteral
 
 // UninstallPlatformCmd represents the APKCTL platform uninstall command

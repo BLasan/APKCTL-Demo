@@ -28,15 +28,9 @@ var outputFormat string
 var allNamespaces bool
 
 const GetAPICmdLiteral = "apis"
-const GetAPICmdShortDesc = "Get all APIs"
-const GetCAPImdLongDesc = `Get all APIs available in a cluster or in a specific namespace defined by (--namespace, -n)
- Get an API available in the namesapce specified by flag (--namespace, -n)`
-const GetAPICmdExamples = utils.ProjectName + ` ` + GetCmdLiteral + ` ` + GetAPICmdLiteral + ` petstore \
-   --service-url http://localhost:9443 -v 1.0.0 -n wso2
-   
-   ` + utils.ProjectName + ` ` + GetCmdLiteral + ` ` + GetCmdLiteral + GetAPICmdLiteral + ` petstore \
-   -f ./swagger.yaml --namespace wso2
- `
+const GetAPICmdShortDesc = "Get APIs"
+const GetCAPImdLongDesc = `List all the deployed APIs. Returned list of APIs can either be from a specific namespace or from all namespaces based on the provided flags.`
+const GetAPICmdExamples = utils.ProjectName + ` ` + GetCmdLiteral + ` ` + GetAPICmdLiteral + ` --namespace=wso2`
 
 // GetApiCmd represents the Get API command
 var GetApiCmd = &cobra.Command{
