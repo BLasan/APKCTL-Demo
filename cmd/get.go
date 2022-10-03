@@ -24,16 +24,14 @@ import (
 )
 
 const GetCmdLiteral = "get"
-const GetCmdShortDesc = "Get API and Deploy"
-const GetCmdLongDesc = `Get new API and Deploy onto the Kubernetes Cluster`
-const GetCmdExamples = utils.ProjectName + ` ` + GetCmdLiteral + ` ` + GetAPICmdLiteral + ` petstore \
-	--namespace  https://localhost:9443 -v 1.0.0
-	
-	NOTE: The flag --environment (-e) is mandatory.
-	You can either provide only the flag --apim , or all the other 4 flags (--registration --publisher --devportal --admin) without providing --apim flag.
-	If you are omitting any of --registration --publisher --devportal --admin flags, you need to specify --apim flag with the API Manager endpoint. In both of the
-	cases --token flag is optional and use it to specify the gateway token endpoint. This will be used for "apictl get-keys" operation.
-	To add a micro integrator instance to an environment you can use the --mi flag.`
+const GetCmdShortDesc = "Get APIs"
+const GetCmdLongDesc = `List all the deployed APIs. Returned list of APIs can either be from a specific namespace or from all namespaces based on the provided flags.`
+const GetCmdExamples = utils.ProjectName + ` ` + GetCmdLiteral + ` ` + GetAPICmdLiteral + ` --namespace=wso2
+
+	NOTE: The following flags are considered as optional
+	--output, -o			Output format
+	--namespace, -n			Namespace of the Data Plane
+	--all-namespaces, -A	List the APIs across all namespaces.`
 
 // GetCmd represents the Get command
 var GetCmd = &cobra.Command{

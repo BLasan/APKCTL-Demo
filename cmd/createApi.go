@@ -31,14 +31,9 @@ var isDryRun bool
 
 const CreateAPICmdLiteral = "api"
 const CreateAPICmdShortDesc = "Create API and Deploy"
-const CreateCAPImdLongDesc = `Create an API available in the namespace specified by flag (--namespace, -n)
-Create an API available in the namesapce specified by flag (--namespace, -n)`
-const createAPICmdExamples = utils.ProjectName + ` ` + CreateCmdLiteral + ` ` + CreateAPICmdLiteral + ` petstore \
-  --service-url http://localhost:9443 -v 1.0.0 -n wso2
-  
-  ` + utils.ProjectName + ` ` + CreateCmdLiteral + ` ` + CreateCmdLiteral + CreateAPICmdLiteral + ` petstore \
-  -f ./swagger.yaml --namespace wso2
-`
+const CreateCAPImdLongDesc = `Create an API and Deploy onto the Kubernetes Cluster`
+const createAPICmdExamples = utils.ProjectName + ` ` + CreateCmdLiteral + ` ` + CreateAPICmdLiteral + ` petstore -f swagger.yaml --version 1.0.0 --namespace wso2
+` + utils.ProjectName + ` ` + CreateCmdLiteral + ` ` + CreateAPICmdLiteral + ` petstore --service-url http://localhost:9443 --namespace wso2`
 
 // CreateApiCmd represents the create API command
 var CreateApiCmd = &cobra.Command{
@@ -61,6 +56,6 @@ func init() {
 	CreateApiCmd.Flags().StringVarP(&dpNamespace, "namespace", "n", "", "Namespace of the API")
 	CreateApiCmd.Flags().StringVar(&serviceUrl, "service-url", "", "Backend Service URL")
 	CreateApiCmd.Flags().StringVarP(&file, "file", "f", "", "Path to swagger/OAS definition/GraphQL SDL/WSDL")
-	CreateApiCmd.Flags().BoolVar(&isDryRun, "dry-run", false, "Generate configuration files")
+	CreateApiCmd.Flags().BoolVar(&isDryRun, "dry-run", false, "Generate API Project inclusive of an HTTPRouteConfig and a ConfigMap")
 	CreateApiCmd.Flags().StringVarP(&version, "version", "", "", "Version of the API")
 }

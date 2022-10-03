@@ -27,10 +27,16 @@ import (
 var version string
 
 const DeleteAPICmdLiteral = "api"
-const DeleteAPICmdShortDesc = "Delete API from a namespace"
-const DeleteCAPImdLongDesc = `Delete an API available in the namespace specified by flag (--namespace, -n)`
-const DeleteAPICmdExamples = utils.ProjectName + ` ` + DeleteCmdLiteral + ` ` + DeleteAPICmdLiteral + ` petstore \
-   -v 1.0.0 -n wso2`
+const DeleteAPICmdShortDesc = "Delete API"
+const DeleteCAPImdLongDesc = `Delete API from Kubernetes Cluster`
+const DeleteAPICmdExamples = utils.ProjectName + ` ` + DeleteCmdLiteral + ` ` + DeleteAPICmdLiteral + ` petstore --version 1.0.0 --namespace wso2
+
+NOTE: The flag --version (-v) is mandatory.
+You can optionally provide the --namespace (-n) flag to specify the namespace of the deployed API that you wish to delete.
+
+The API to be deleted is identified using the API name and version.
+Optionally, you can specify the namespace that the API resides in.
+If the API does not exist, an error is thrown.`
 
 // DeleteApiCmd represents the Delete API command
 var DeleteApiCmd = &cobra.Command{
@@ -39,7 +45,6 @@ var DeleteApiCmd = &cobra.Command{
 	Long:    DeleteCAPImdLongDesc,
 	Example: DeleteAPICmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
-		// fmt.Println("API Name: ", args[0])
 		apiName := args[0]
 		handleDeleteApi(apiName)
 	},

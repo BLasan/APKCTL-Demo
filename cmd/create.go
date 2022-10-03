@@ -25,15 +25,8 @@ import (
 
 const CreateCmdLiteral = "create"
 const CreateCmdShortDesc = "Create API and Deploy"
-const CreateCmdLongDesc = `Create new API and Deploy onto the Kubernetes Cluster`
-const createCmdExamples = utils.ProjectName + ` ` + CreateCmdLiteral + ` ` + CreateAPICmdLiteral + ` petstore \
-   --namespace  https://localhost:9443 -v 1.0.0
-   
-   NOTE: The flag --environment (-e) is mandatory.
-   You can either provide only the flag --apim , or all the other 4 flags (--registration --publisher --devportal --admin) without providing --apim flag.
-   If you are omitting any of --registration --publisher --devportal --admin flags, you need to specify --apim flag with the API Manager endpoint. In both of the
-   cases --token flag is optional and use it to specify the gateway token endpoint. This will be used for "apictl get-keys" operation.
-   To add a micro integrator instance to an environment you can use the --mi flag.`
+const CreateCmdLongDesc = `Create an API and Deploy onto the Kubernetes Cluster`
+const createCmdExamples = utils.ProjectName + ` ` + CreateCmdLiteral + ` ` + CreateAPICmdLiteral + ` petstore --version 1.0.0 -f swagger.yaml -n wso2`
 
 // CreateCmd represents the create command
 var CreateCmd = &cobra.Command{
@@ -42,7 +35,3 @@ var CreateCmd = &cobra.Command{
 	Long:    CreateCmdLongDesc,
 	Example: createCmdExamples,
 }
-
-// func init() {
-// 	RootCmd.AddCommand(CreateCmd)
-// }
