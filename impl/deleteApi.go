@@ -32,10 +32,10 @@ func DeleteAPI(namespace, apiName, version string) {
 	// Execute kubernetes command to delete API
 	if deleteApiErr := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, resource, "-n", namespace); deleteApiErr != nil {
 		if namespace != "" {
-			errMsg = fmt.Sprintf("\nCould not find the API \"%s\" in the \"%s\" namespace\n",
-				apiName, namespace)
+			errMsg = fmt.Sprintf("\nCould not find \"%s\" API with version \"%s\" in the \"%s\" namespace\n",
+				apiName, version, namespace)
 		} else {
-			errMsg = fmt.Sprintf("\nCould not find the API \"%s\"\n", apiName)
+			errMsg = fmt.Sprintf("\nCould not find \"%s\" API with version \"%s\"\n", apiName, version)
 		}
 		fmt.Println(errMsg)
 		utils.HandleErrorAndExit("Error executing K8s command ", nil)
