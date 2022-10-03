@@ -437,11 +437,11 @@ func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version stri
 		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
 	}
 
-	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, utils.OpenAPI3)
+	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion)
 	// utils.CreateConfigMapFromTemplate(configmap, dirPath)
 
 	fmt.Println("Successfully created API project with HttpRouteConfig and ConfigMap files!")
-	fmt.Println("API project directory: " + utils.APIProjectsDir + apiName)
+	fmt.Println("API project directory: " + utils.APIProjectsDir + apiName + "-" + version)
 }
 
 func createConfigMap(ext, dirPath, namespace, apiname string, definition interface{}, swaggerVersion string) {
