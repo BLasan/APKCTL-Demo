@@ -29,6 +29,7 @@ const K8sConfig = "config"
 const K8sView = "view"
 
 const K8sHttpRoute = "httproute"
+const K8sConfigMap = "configmap"
 
 const FilenameFlag = "-f"
 const MinifyFlag = "--minify"
