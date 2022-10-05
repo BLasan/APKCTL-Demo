@@ -1,21 +1,35 @@
-# Default values for apk-helm.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
-
-
+# Copyright (c) 2022, WSO2 LLC. (https://www.wso2.com) All Rights Reserved.
+#
+# WSO2 LLC. licenses this file to you under the Apache License,
+# Version 2.0 (the "License"); you may not use this file except
+# in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied. See the License for the
+# specific language governing permissions and limitations
+# under the License.
 
 wso2:
   apk:
     cp:
       enabled: true
+      postgresql:
+        enabled: true
+      ipk:
+        enabled: true
       devportal:
         appName: "devportal-ds"
         deployment:
           npi: devportal-ds-npi
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "200m"
+              memory: "512Mi"
+              cpu: "500m"
             limits:
               memory: "1028Mi"
               cpu: "1000m"
@@ -43,8 +57,8 @@ wso2:
           npi: admin-ds-npi
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "200m"
+              memory: "512Mi"
+              cpu: "500m"
             limits:
               memory: "1028Mi"
               cpu: "1000m"
@@ -72,8 +86,8 @@ wso2:
           npi: publisher-ds-npi
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "200m"
+              memory: "512Mi"
+              cpu: "500m"
             limits:
               memory: "1028Mi"
               cpu: "1000m"
@@ -101,8 +115,8 @@ wso2:
           npi: sts-ds-npi
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "200m"
+              memory: "512Mi"
+              cpu: "500m"
             limits:
               memory: "1028Mi"
               cpu: "1000m"
@@ -130,8 +144,8 @@ wso2:
           npi: devportal-ui-npi
           resources:
             requests:
-              memory: "256Mi"
-              cpu: "200m"
+              memory: "512Mi"
+              cpu: "500m"
             limits:
               memory: "1028Mi"
               cpu: "1000m"
@@ -160,3 +174,18 @@ wso2:
         clusterName: cluster-example
         appUserPassword: password
         superUserPassword: password
+postgresql:
+  auth:
+    postgresPassword: "test1"
+  primary:
+    initdb:
+      scriptsConfigMap: postgres-initdb-scripts-configmap
+      user: postgres
+      password: "test1"
+  image:
+    debug: true
+ipk:
+  wso2:
+    deployment:
+      wso2is:
+        replicas: 1
