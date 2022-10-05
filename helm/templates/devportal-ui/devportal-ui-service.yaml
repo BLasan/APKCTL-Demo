@@ -21,7 +21,6 @@ metadata:
   name: devportal-ui-service
   namespace : {{ .Release.Namespace }}
 spec:
-  type: NodePort
   # label keys and values that must match in order to receive traffic for this service
   selector:
 {{ include "apk-helm.pod.selectorLabels" (dict "root" . "app" .Values.wso2.apk.cp.devportalUI.appName ) | indent 4}}
@@ -29,5 +28,4 @@ spec:
     - name: servlet-https
       protocol: TCP
       port: 4000
-      nodePort: 30007
 {{- end -}}
