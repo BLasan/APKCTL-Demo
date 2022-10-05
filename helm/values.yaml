@@ -189,3 +189,4 @@ ipk:
     deployment:
       wso2is:
         replicas: 1
+        

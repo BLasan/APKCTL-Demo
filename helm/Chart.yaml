@@ -13,3 +13,4 @@ dependencies:
     version: "6.0.0-1"
     repository: "http://localhost:8082"
     condition: wso2.apk.cp.ipk.enabled
+    
