@@ -15,7 +15,7 @@
 ```HELM-HOME``` = APKCTL-demo/helm
 
 1. Execute ``` helm repo add bitnami https://charts.bitnami.com/bitnami ```
-2. Follow IPK's 'Install from a chart respository' guide here : https://docs.google.com/document/d/1GJxX7BiYL44mfnCJtm-JfiuwrMmIGC-DkQI5YZ_93zk
+2. Follow IPK's 'Install from a chart repository' guide here : https://docs.google.com/document/d/1GJxX7BiYL44mfnCJtm-JfiuwrMmIGC-DkQI5YZ_93zk
     <br>
 
     When following the IPK guide's "Add chart museum repo to helm" step, if you used 8080 port, change the port in ```HELM-HOME```/Chart.yaml ipk.repository value according to that. 
