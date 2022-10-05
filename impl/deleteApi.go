@@ -27,10 +27,12 @@ import (
 
 func DeleteAPI(namespace, apiName, version string) {
 	var errMsg string
-	resource := k8sUtils.K8sHttpRoute + "/" + apiName + "-" + version
+	resourceName := apiName + "-" + version
+	resourceHttpRoute := k8sUtils.K8sHttpRoute + "/" + resourceName
+	resourceConfigMap := k8sUtils.K8sConfigMap + "/" + resourceName
 
 	// Execute kubernetes command to delete API
-	if deleteApiErr := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, resource, "-n", namespace); deleteApiErr != nil {
+	if deleteApiErr := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, resourceHttpRoute, resourceConfigMap, "-n", namespace); deleteApiErr != nil {
 		if namespace != "" {
 			errMsg = fmt.Sprintf("\nCould not find \"%s\" API with version \"%s\" in the \"%s\" namespace\n",
 				apiName, version, namespace)
