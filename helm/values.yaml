@@ -1,0 +1,162 @@
+# Default values for apk-helm.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+
+
+wso2:
+  apk:
+    cp:
+      enabled: true
+      devportal:
+        appName: "devportal-ds"
+        deployment:
+          npi: devportal-ds-npi
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "1028Mi"
+              cpu: "1000m"
+          readinessProbe:
+            path: /api/am/devportal/v2/apis?limit=2&offset=2
+            port: 9443
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          livenessProbe:
+            path: /api/am/devportal/v2/apis?limit=2&offset=2
+            port: 9443
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          strategy: Recreate
+          replicas: 1
+          imagePullPolicy: IfNotPresent
+          image: rakhitharr/apk-devportal:0.1.0
+        ingress:
+          path: /api/am/devportal
+      admin:
+        appName: "admin-ds"
+        deployment:
+          npi: admin-ds-npi
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "1028Mi"
+              cpu: "1000m"
+          readinessProbe:
+            path: /api/am/admin/v3/settings?limit=2&offset=2
+            port: 9443
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          livenessProbe:
+            path: /api/am/admin/v3/settings?limit=2&offset=2
+            port: 9443
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          strategy: Recreate
+          replicas: 1
+          imagePullPolicy: IfNotPresent
+          image: rakhitharr/apk-admin:0.1.0
+        ingress:
+          path: /api/am/admin
+      publisher:
+        appName: "publisher-ds"
+        deployment:
+          npi: publisher-ds-npi
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "1028Mi"
+              cpu: "1000m"
+          readinessProbe:
+            path: /api/am/publisher/v3/apis?limit=2&offset=2&sortBy=name&sortOrder=1
+            port: 9443
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          livenessProbe:
+            path: /api/am/publisher/v3/apis?limit=2&offset=2&sortBy=name&sortOrder=1
+            port: 9443
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          strategy: Recreate
+          replicas: 1
+          imagePullPolicy: IfNotPresent
+          image: rakhitharr/apk-publisher:0.1.0
+        ingress:
+          path: /api/am/publisher
+      sts:
+        appName: "sts-ds"
+        deployment:
+          npi: sts-ds-npi
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "1028Mi"
+              cpu: "1000m"
+          readinessProbe:
+            path: /health
+            port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          livenessProbe:
+            path: /health
+            port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          strategy: Recreate
+          replicas: 1
+          imagePullPolicy: IfNotPresent
+          image: lakshithag/apk-sts
+        ingress:
+          path:  /api/am/sts
+      devportalUI:
+        appName: "devportal-ui"
+        deployment:
+          npi: devportal-ui-npi
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "200m"
+            limits:
+              memory: "1028Mi"
+              cpu: "1000m"
+          readinessProbe:
+            path: /
+            port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          livenessProbe:
+            path: /
+            port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            failureThreshold: 5
+          strategy: Recreate
+          replicas: 1
+          imagePullPolicy: Always
+          image: chanaka3d/portals:linux1.0.0
+        ingress:
+          path:  /
+          host: portal.ui.wso2
+      cnpg:
+        npi: cnpg-npi
+        instances: 1
+        clusterName: cluster-example
+        appUserPassword: password
+        superUserPassword: password

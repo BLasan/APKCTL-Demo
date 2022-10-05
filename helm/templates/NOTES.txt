@@ -1,0 +1,6 @@
+1. Get the application URL by running these commands:
+You can get the ip address using 'kubectl get ing' command, IP address will be shown under ADDRESS column.
+
+To connect with devportal use http://<ip-address>//api/am/devportal/<version>/<uri>, for example http://192.168.49.2/api/am/devportal/v2/apis?limit=2&offset=2
+To connect with admin use http://<ip-address>//api/am/admin/<version>/<uri>, for example http://192.168.49.2/api/am/admin/v3/settings?limit=2&offset=2
+To connect with publisher use http://<ip-address>//api/am/publisher/<version>/<uri>, for example 192.168.49.2/api/am/publisher/v3/apis?limit=2&offset=2&sortBy=name&sortOrder=1
