@@ -1,2 +1,5 @@
 # Directories generated for API projects
 target/
+
+# Directories generated for helm
+helm/charts/
