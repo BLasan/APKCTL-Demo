@@ -47,5 +47,6 @@ func main() {
 	RootCmd.AddCommand(cmd.DeleteCmd)
 	RootCmd.AddCommand(cmd.GetCmd)
 	RootCmd.AddCommand(cmd.UninstallPlatformCmd)
+	RootCmd.AddCommand(cmd.VersionCmd)
 	execute()
 }
