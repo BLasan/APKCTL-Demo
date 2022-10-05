@@ -400,7 +400,7 @@ func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version stri
 		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
 	}
 
-	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion)
+	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion, version)
 	// utils.CreateConfigMapFromTemplate(configmap, dirPath)
 
 	args := []string{k8sUtils.K8sApply, k8sUtils.FilenameFlag, filepath.Join(dirPath, "")}
@@ -437,18 +437,18 @@ func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version stri
 		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
 	}
 
-	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion)
+	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion, version)
 	// utils.CreateConfigMapFromTemplate(configmap, dirPath)
 
 	fmt.Println("Successfully created API project with HttpRouteConfig and ConfigMap files!")
 	fmt.Println("API project directory: " + utils.APIProjectsDir + apiName + "-" + version)
 }
 
-func createConfigMap(ext, dirPath, namespace, apiname string, definition interface{}, swaggerVersion string) {
+func createConfigMap(ext, dirPath, namespace, apiname string, definition interface{}, swaggerVersion, apiversion string) {
 	configmap := utils.ConfigMap{}
 	configmap.ApiVersion = "v1"
 	configmap.Kind = "ConfigMap"
-	configmap.MetaData.Name = apiname + "-swagger-configmap"
+	configmap.MetaData.Name = apiname + "-" + apiversion
 
 	if namespace != "" {
 		configmap.MetaData.Namespace = namespace
