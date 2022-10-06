@@ -143,7 +143,8 @@ func installCPComponents(namespace string) {
 		utils.Helm,
 		utils.HelmRepo,
 		utils.HelmAdd,
-		"bitnami https://charts.bitnami.com/bitnami",
+		"bitnami",
+		"https://charts.bitnami.com/bitnami",
 	); err != nil {
 		utils.HandleErrorAndExit("Error encountered while adding bitnami Helm chart", err)
 	}
@@ -153,15 +154,20 @@ func installCPComponents(namespace string) {
 		utils.Helm,
 		utils.HelmRepo,
 		utils.HelmAdd,
-		"chartmuseum http://localhost:8080",
+		"chartmuseum",
+		"http://localhost:8080",
 	); err != nil {
 		utils.HandleErrorAndExit("Error encountered while adding chartmuseum Helm chart", err)
 	}
 
+	// Change directory to APK Helm home
+	utils.ChangeDirectory("helm")
+
 	// Download the dependent charts
 	if err := k8sUtils.ExecuteCommand(
 		utils.Helm,
-		utils.HelmDependencyBuild,
+		utils.HelmDependency,
+		utils.HelmBuild,
 	); err != nil {
 		utils.HandleErrorAndExit("Error encountered while executing the Helm dependency build command", err)
 	}
@@ -172,15 +178,21 @@ func installCPComponents(namespace string) {
 		utils.HelmInstall,
 		utils.APKHelmChartReleaseName,
 		".",
-		"--set ipk.wso2.subscription.username=<username>",
-		"--set ipk.wso2.subscription.password=<password>",
-		"--set wso2.apk.cp.ipk.enabled=false", // to disable IPK temporarily
+		utils.HelmSetFlag,
+		"ipk.wso2.subscription.username=<username>",
+		utils.HelmSetFlag,
+		"ipk.wso2.subscription.password=<password>",
+		utils.HelmSetFlag,
+		"wso2.apk.cp.ipk.enabled=false", // to disable IPK temporarily
 		utils.HelmNamespaceFlag,
 		namespace,
 		utils.HelmCreateNamespaceFlag,
 	); err != nil {
 		utils.HandleErrorAndExit("Error encountered while installing Helm chart", err)
 	}
+
+	// Change directory to APKCTL home
+	utils.ChangeDirectory("../")
 }
 
 func getPodStatus() string {

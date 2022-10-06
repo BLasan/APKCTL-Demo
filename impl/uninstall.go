@@ -34,6 +34,8 @@ func UninstallPlatform() {
 
 	// Uninstall Control Plane profile
 	uninstallCPComponents()
+
+	fmt.Println("\nUninstallation completed!")
 }
 
 // Handle Envoy Gateway uninstallation
@@ -66,8 +68,6 @@ func uninstallEnvoyGateway() {
 	); err != nil {
 		utils.HandleErrorAndExit("Error uninstalling Gateway API CRDs", err)
 	}
-
-	fmt.Println("\nUninstallation completed!")
 }
 
 func uninstallCPComponents() {
