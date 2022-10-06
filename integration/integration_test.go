@@ -1,7 +1,9 @@
 package integration
 
 import (
+	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/BLasan/APKCTL-Demo/integration/adminservices"
@@ -76,6 +78,7 @@ func TestMain(m *testing.M) {
 	}
 
 	base.RelativeBinaryPath = dir + "/../"
+	base.RelativeTargetDirPath = dir
 
 	deployBackendService()
 
@@ -85,11 +88,21 @@ func TestMain(m *testing.M) {
 }
 
 func deployBackendService() {
-	args := []string{"apply", "-f", "testData/BackendService.yaml"}
-	base.ManageMicroservice(args...)
+
+	args := []string{"apply", "-f", filepath.Join(base.RelativeTargetDirPath, "testData/BackendService.yaml")}
+	fmt.Println("Args: ", args)
+	_, err := base.ManageMicroservice(args...)
+	if err != nil {
+		fmt.Println("Error while deploying the Backend Service")
+	}
+
+	// fmt.Println("Output: ", out)
 }
 
 func removeBackendService() {
-	args := []string{"delete", "-f", "testData/BackendService.yaml"}
-	base.ManageMicroservice(args...)
+	args := []string{"delete", "-f", filepath.Join(base.RelativeTargetDirPath, "testData/BackendService.yaml")}
+	_, err := base.ManageMicroservice(args...)
+	if err != nil {
+		fmt.Println("Error while removing the Backeend Service")
+	}
 }

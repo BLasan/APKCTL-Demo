@@ -1,6 +1,7 @@
 package testutils
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -14,12 +15,16 @@ import (
 
 func AddNewAPIWithSwagger(t *testing.T, swagerPath string) {
 	t.Helper()
-	apiName := base.GenerateRandomName(15) + "API"
+	apiName := base.GenerateRandomName(15) + "api"
 	apiVersion := APIVersion
 	out, err := deployAPIWithSwagger(t, apiName, apiVersion, swagerPath)
 
 	assert.Nil(t, err, "Error while deploying API")
 	assert.Contains(t, out, "Successfully deployed")
+
+	t.Cleanup(func() {
+		removeAPI(t, apiName, apiVersion)
+	})
 }
 
 func CreateNewAPIFromSwaggerWithDryRun(t *testing.T, swagerPath string) {
@@ -29,18 +34,23 @@ func CreateNewAPIFromSwaggerWithDryRun(t *testing.T, swagerPath string) {
 	out, err := createAPIWithSwagger(t, apiName, apiVersion, swagerPath)
 
 	assert.Nil(t, err, "Error while creating API from Swagger File")
-	assert.Contains(t, out, "Successfully created")
+	assert.Contains(t, out, "Successfully created API project with HttpRouteConfig and ConfigMap files!")
 
 	apiProjectDir := base.GetExportedPathFromOutput(out)
 
-	httprouteconfig := filepath.Join(apiProjectDir, HttpRouteConfigFile)
-	configmap := filepath.Join(apiProjectDir, ConfigMapFile)
+	fmt.Println("Project Dir: ", apiProjectDir)
+
+	httprouteconfig := filepath.Join(base.RelativeTargetDirPath, apiProjectDir, HttpRouteConfigFile)
+
+	configmap := filepath.Join(base.RelativeTargetDirPath, apiProjectDir, ConfigMapFile)
 
 	assert.True(t, base.IsFileAvailable(t, httprouteconfig), "HttpRouteConfig is not available")
 	assert.True(t, base.IsFileAvailable(t, configmap), "ConfigMap is not available")
 
-	removeFile(t, httprouteconfig)
-	removeFile(t, configmap)
+	removeAll(t, filepath.Join(base.RelativeTargetDirPath, apiProjectDir+"../../../"))
+
+	// removeFile(t, httprouteconfig)
+	// removeFile(t, configmap)
 }
 
 func AddNewAPIWithBackendServiceURL(t *testing.T) {
@@ -64,14 +74,18 @@ func CreateNewAPIFromBackendServiceURLWithDryRun(t *testing.T) {
 
 	apiProjectDir := base.GetExportedPathFromOutput(out)
 
-	httprouteconfig := filepath.Join(apiProjectDir, HttpRouteConfigFile)
-	configmap := filepath.Join(apiProjectDir, ConfigMapFile)
+	httprouteconfig := filepath.Join(base.RelativeTargetDirPath, apiProjectDir, HttpRouteConfigFile)
+	configmap := filepath.Join(base.RelativeTargetDirPath, apiProjectDir, ConfigMapFile)
 
 	assert.True(t, base.IsFileAvailable(t, httprouteconfig), "HttpRouteConfig is not available")
 	assert.True(t, base.IsFileAvailable(t, configmap), "ConfigMap is not available")
 
-	removeFile(t, httprouteconfig)
-	removeFile(t, configmap)
+	absPath := filepath.Join(base.RelativeTargetDirPath, apiProjectDir+"../../../")
+
+	removeAll(t, absPath)
+
+	// removeFile(t, httprouteconfig)
+	// removeFile(t, configmap)
 
 }
 
@@ -127,10 +141,7 @@ func uninstallAPK(t *testing.T) (string, error) {
 
 // Creates API from swagger file
 func deployAPIWithSwagger(t *testing.T, apiName, apiversion, swagger string) (string, error) {
-	output, err := base.Execute(t, "create", "api", apiName, "-f", swagger, "--verbose")
-	t.Cleanup(func() {
-		removeAPI(t, apiName, apiversion)
-	})
+	output, err := base.Execute(t, "create", "api", apiName, "--version", apiversion, "-f", swagger, "--verbose")
 	return output, err
 }
 
@@ -156,7 +167,7 @@ func validateAPIRelatedFiles(t *testing.T, httprouteconfig, configmap string) {
 
 // Creates API from swagger file
 func createAPIWithSwagger(t *testing.T, apiName, apiversion, swagger string) (string, error) {
-	output, err := base.Execute(t, "create", "api", apiName, "-f", swagger, "--dry-run", "--verbose")
+	output, err := base.Execute(t, "create", "api", apiName, "--version", apiversion, "-f", swagger, "--dry-run", "--verbose")
 	t.Cleanup(func() {
 		removeAPI(t, apiName, apiversion)
 	})
@@ -174,6 +185,16 @@ func createAPIWithBackendServiceURL(t *testing.T, apiName, apiversion, backendUR
 
 func removeAPI(t *testing.T, apiname, version string) {
 	base.Execute(t, "delete", "api", apiname, "--version", version)
+}
+
+func removeAll(t *testing.T, dirname string) {
+	t.Log("testutils.removeAll() - dir path:", dirname)
+	if _, err := os.Stat(dirname); err == nil {
+		err := os.RemoveAll(dirname)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
 }
 
 func removeFile(t *testing.T, filename string) {

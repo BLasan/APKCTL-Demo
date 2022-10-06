@@ -10,7 +10,7 @@ import (
 
 //Generate random strings with given length
 func GenerateRandomName(n int) string {
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+	var letters = []rune("abcdefghijklmnopqrstuvwxyz0123456789")
 
 	s := make([]rune, n)
 	for i := range s {
