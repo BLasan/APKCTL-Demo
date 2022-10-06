@@ -62,3 +62,11 @@ resources:
     memory: {{ .limits.memory }}
     cpu: {{ .limits.cpu }}
 {{- end }}
+
+
+{{/*
+Common prefix prepended to Kubernetes resources of this chart
+*/}}
+{{- define "apk.resource.prefix" -}}
+{{- printf "%s-wso2-apk" .Release.Name }}
+{{- end -}}

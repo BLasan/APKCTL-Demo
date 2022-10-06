@@ -18,8 +18,8 @@
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: publisher-ds-network-policy
-  namespace: default
+  name: {{ template "apk.resource.prefix" . }}-publisher-ds-network-policy
+  namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
     matchLabels:

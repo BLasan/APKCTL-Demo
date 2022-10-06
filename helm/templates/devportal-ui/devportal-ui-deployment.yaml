@@ -18,7 +18,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: devportal-ui-deployment
+  name: {{ template "apk.resource.prefix" . }}-devportal-ui-deployment
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.wso2.apk.cp.devportalUI.deployment.replicas }}
@@ -48,7 +48,7 @@ spec:
       volumes:
         - name: devportal-ui-conf-volume
           configMap:
-            name: devportal-ui-conf
+            name: {{ template "apk.resource.prefix" . }}-devportal-ui-conf
             items:
             - key: Settings.js
               path: Settings.js

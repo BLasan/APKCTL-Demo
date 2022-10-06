@@ -18,7 +18,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: devportal-ui-service
+  name: {{ template "apk.resource.prefix" . }}-devportal-ui-service
   namespace : {{ .Release.Namespace }}
 spec:
   # label keys and values that must match in order to receive traffic for this service

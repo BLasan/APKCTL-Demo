@@ -18,7 +18,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: dev-portal-ds-deployment
+  name: {{ template "apk.resource.prefix" . }}-dev-portal-ds-deployment
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.wso2.apk.cp.devportal.deployment.replicas }}
