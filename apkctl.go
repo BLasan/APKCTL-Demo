@@ -20,12 +20,15 @@ package main
 
 import (
 	"os"
+	"time"
 
 	cmd "github.com/BLasan/APKCTL-Demo/cmd"
+	"github.com/BLasan/APKCTL-Demo/utils"
 	"github.com/spf13/cobra"
 )
 
 var cfgFile string
+var verbose bool
 
 // RootCmd ...
 var RootCmd = &cobra.Command{
@@ -42,6 +45,7 @@ func execute() {
 }
 
 func main() {
+	RootCmd.PersistentFlags().BoolVar(&verbose, "verbose", false, "Enable verbose mode")
 	RootCmd.AddCommand(cmd.InstallPlatformCmd)
 	RootCmd.AddCommand(cmd.CreateCmd)
 	RootCmd.AddCommand(cmd.DeleteCmd)
@@ -49,4 +53,16 @@ func main() {
 	RootCmd.AddCommand(cmd.UninstallPlatformCmd)
 	RootCmd.AddCommand(cmd.VersionCmd)
 	execute()
+}
+
+func init() {
+	cobra.OnInitialize(initConfig)
+}
+
+func initConfig() {
+	if verbose {
+		utils.EnableVerboseMode()
+		t := time.Now()
+		utils.Logf("Executed ImportExportCLI (%s) on %v\n", utils.ProjectName, t.Format(time.RFC1123))
+	}
 }
