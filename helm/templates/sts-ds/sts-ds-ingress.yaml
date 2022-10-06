@@ -18,10 +18,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: sts-ds-ingress
+  name: {{ template "apk.resource.prefix" . }}-sts-ds-ingress
   namespace: {{ .Release.Namespace }}
+{{- if .Values.wso2.apk.cp.sts.ingress.annotations }}
+  annotations:
+{{ toYaml .Values.wso2.apk.cp.sts.ingress.annotations | indent 4 }}
+{{- end }}
 spec:
-  ingressClassName: nginx
+  {{- if .Values.wso2.apk.cp.sts.ingress.className }}
+  ingressClassName: {{ .Values.wso2.apk.cp.sts.ingress.className }}
+  {{- end }}
   rules:
     - http:
         paths:
@@ -29,7 +35,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: sts-ds-service
+                name: {{ template "apk.resource.prefix" . }}-sts-ds-service
                 port:
                   number: 9443
 {{- end -}}

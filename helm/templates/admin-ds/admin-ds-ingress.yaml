@@ -18,10 +18,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: admin-ds-ingress
+  name: {{ template "apk.resource.prefix" . }}-admin-ds-ingress
   namespace: {{ .Release.Namespace }}
+{{- if .Values.wso2.apk.cp.admin.ingress.annotations }}
+  annotations:
+{{ toYaml .Values.wso2.apk.cp.admin.ingress.annotations | indent 4 }}
+{{- end }}
 spec:
-  ingressClassName: nginx  
+  {{- if .Values.wso2.apk.cp.admin.ingress.className }}
+  ingressClassName: {{ .Values.wso2.apk.cp.admin.ingress.className }}
+  {{- end }}
   rules:
     - http:
         paths:
@@ -29,7 +35,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: admin-ds-service
+                name: {{ template "apk.resource.prefix" . }}-admin-ds-service
                 port:
                   number: 9443
 {{- end -}}

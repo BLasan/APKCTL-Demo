@@ -18,7 +18,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: admin-ds-deployment
+  name: {{ template "apk.resource.prefix" . }}-admin-ds-deployment
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.wso2.apk.cp.admin.deployment.replicas }}

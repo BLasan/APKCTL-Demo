@@ -18,7 +18,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sts-ds-deployment
+  name: {{ template "apk.resource.prefix" . }}-sts-ds-deployment
   namespace: {{ .Release.Namespace }}
 spec:
   replicas: {{ .Values.wso2.apk.cp.sts.deployment.replicas }}

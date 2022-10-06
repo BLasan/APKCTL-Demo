@@ -18,12 +18,16 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: devportal-ui-ingress
+  name: {{ template "apk.resource.prefix" . }}-devportal-ui-ingress
   namespace: {{ .Release.Namespace }}
+{{- if .Values.wso2.apk.cp.devportalUI.ingress.annotations }}
   annotations:
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+{{ toYaml .Values.wso2.apk.cp.devportalUI.ingress.annotations | indent 4 }}
+{{- end }}
 spec:
-  ingressClassName: nginx  
+  {{- if .Values.wso2.apk.cp.devportalUI.ingress.className }}
+  ingressClassName: {{ .Values.wso2.apk.cp.devportalUI.ingress.className }}
+  {{- end }}
   rules:
     - host: {{ .Values.wso2.apk.cp.devportalUI.ingress.host }}
       http:
@@ -32,7 +36,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: devportal-ui-service
+                name: {{ template "apk.resource.prefix" . }}-devportal-ui-service
                 port:
                   number: 4000
 {{- end -}}
