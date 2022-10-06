@@ -24,6 +24,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var profile string
+var namespace string
+var helmVersion int
+
 const InstallPlatformCmdLiteral = "install platform"
 const InstallPlatformCmdShortDesc = "Install APIM Control Plane component(s) and Data Plane component(s)"
 const InstallPlatformCmdLongDesc = `Install APIM Control Plane component(s) and Data Plane component(s)`
@@ -41,9 +45,12 @@ var InstallPlatformCmd = &cobra.Command{
 }
 
 func handleInstallPlatform() {
-	impl.InstallPlatform()
+	impl.InstallPlatform(profile, namespace, helmVersion)
 }
 
 func init() {
-
+	InstallPlatformCmd.Flags().StringVar(&profile, "profile", "", "Name of profile i.e. CP (Control Plane) or DP (Data Plane)")
+	InstallPlatformCmd.Flags().StringVarP(&namespace, "namespace", "n", "", `Namespace for the profile.
+		Note that CP and DP can be in two different namespaces or in same namespace`)
+	InstallPlatformCmd.Flags().IntVar(&helmVersion, "helm-version", 3, "Helm version to use")
 }

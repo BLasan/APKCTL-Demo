@@ -31,6 +31,11 @@ func GetAPKCTLHomeDir() (string, error) {
 	return os.Getwd()
 }
 
+func GetAPKHelmHomeDir() (string, error) {
+	pwd, err := os.Getwd()
+	return pwd + "/helm", err
+}
+
 // Retrieve name of the connected cluster
 func GetClusterName() string {
 	clusterName, _ := k8sUtils.GetCommandOutput(

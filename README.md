@@ -16,7 +16,10 @@ To get started with APKCTL, you will need to have the prerequisites listed below
 - **Kubernetes**: tested using v1.24.3 (envoy gateway tested version - 1.24.1)
 - **Docker**: tested using Docker version 20.10.17-rd
 - [Kubectl](https://kubernetes.io/docs/tasks/tools/install-kubectl/)
-- **Dockerd** is used as the container runtime (If your using Rancher,  you can verify the container runtime by navigating to Preferences -> Container Runtime 
+- [Helm](https://helm.sh/docs/intro/install/): version v3.10.0
+- [NGINX Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/)
+    * If you are using Minikube you can install ingress by running ```minikube addons enable ingress```
+    * If you are using Rancher Desktop, use the folllowing [guide](https://kubernetes.github.io/ingress-nginx/deploy/#rancher-desktop)
 
 ### Clone and Setup APKCTL
 
@@ -99,8 +102,8 @@ Clean up by executing the following commands once you are done.
 ## List of Commands
 
 
-- apkctl install platform
+- apkctl install platform --profile \<Name of Profile: cp or dp\> -n \<Namespace\> --helm-version \<Helm Version\>
 - apkctl create api \<API Name\> --version \<API Version\> -n \<Namespace\> -f \<API Definition File\> --service-url \<Service URL\> --dry-run
-- apkctl delete api \<API Name\>
+- apkctl delete api \<API Name\> --version \<API Version\> -n \<Namespace\>
 - apkctl get apis -n \<Namespace> -o \<Outptut Format\>
 - apkctl uninstall platform

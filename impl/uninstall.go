@@ -29,7 +29,15 @@ func UninstallPlatform() {
 	// Uninstall k8s components that were installed through `apkctl install platform` command
 	fmt.Println("Platform uninstallation initialized...")
 
-	// Envoy Gateway uninstallation (Data Plane profile)
+	// Uninstall Data Plane profile
+	uninstallEnvoyGateway()
+
+	// Uninstall Control Plane profile
+	uninstallCPComponents()
+}
+
+// Handle Envoy Gateway uninstallation
+func uninstallEnvoyGateway() {
 	// Delete the Gateway
 	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "gateway/eg"); err != nil {
 		utils.HandleErrorAndExit("Error deleting the Gateway", err)
@@ -60,4 +68,17 @@ func UninstallPlatform() {
 	}
 
 	fmt.Println("\nUninstallation completed!")
+}
+
+func uninstallCPComponents() {
+	if err := k8sUtils.ExecuteCommand(
+		utils.Helm,
+		utils.HelmUninstall,
+		utils.APKHelmChartReleaseName,
+		// TODO: Need support to get the namespace as a flag to uninstall Helm charts from the installed namespace
+		// utils.HelmNamespaceFlag,
+		// namespace,
+	); err != nil {
+		utils.HandleErrorAndExit("Error encountered while uninstalling Helm chart", err)
+	}
 }

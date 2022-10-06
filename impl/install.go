@@ -32,16 +32,63 @@ const envoyGatewayInstallYaml = "https://github.com/envoyproxy/gateway/releases/
 const gatewayClassYaml = "https://raw.githubusercontent.com/envoyproxy/gateway/v0.2.0-rc1/examples/kubernetes/gatewayclass.yaml"
 const gatewayYaml = "https://raw.githubusercontent.com//envoyproxy/gateway/v0.2.0-rc1/examples/kubernetes/gateway.yaml"
 
-func InstallPlatform() {
-	// Install components in K8s default cluster with default namespace
-	fmt.Printf(
-		"Connected Cluster Name: %s\nContext: %s\nNamespace: %s\n\n",
-		utils.GetClusterName(),
-		utils.GetContext(),
-		utils.GetNamespace(),
-	)
+func InstallPlatform(profile, namespace string, helmVersion int) {
 
-	// Envoy Gateway installation (Data Plane profile)
+	if helmVersion == 2 {
+		utils.HandleErrorAndExit("Please use Helm version 3 as version 2 is not supported yet", nil)
+	}
+
+	// If profile is not specified using the --profile flag, install all K8s components
+	// (i.e. Components of Control Plane and Data Plane)
+	if profile == "" {
+		// Install components in K8s default cluster with default namespace
+		if namespace == "" {
+			namespace = utils.GetNamespace()
+		}
+		fmt.Printf(
+			"Installing APK Platform...\nConnected Cluster Name: %s\nContext: %s\nNamespace: %s\n\n",
+			utils.GetClusterName(),
+			utils.GetContext(),
+			namespace,
+		)
+
+		// Data Plane profile setup
+		installEnvoyGateway()
+
+		// Control Plane profile setup
+		installCPComponents(namespace)
+
+	} else if profile == "dp" {
+		// TODO: Re-do when the namespace used by the envoy gateway can be overriden 
+		// Install components in K8s default cluster with default namespace
+		fmt.Printf(
+			"Installing Data Plane Components...\nConnected Cluster Name: %s\nContext: %s\nNamespace: %s\n\n",
+			utils.GetClusterName(),
+			utils.GetContext(),
+			utils.GetNamespace(),
+		)
+
+		// Data Plane profile setup
+		installEnvoyGateway()
+	} else if profile == "cp" {
+		if namespace == "" {
+			namespace = utils.GetNamespace()
+		}
+
+		fmt.Printf(
+			"Installing Control Plane Components...\nConnected Cluster Name: %s\nContext: %s\nNamespace: %s\n\n",
+			utils.GetClusterName(),
+			utils.GetContext(),
+			namespace,
+		)
+		
+		installCPComponents(namespace)
+	}
+	fmt.Println("\nAll Done! We have configured APK to help you build and manage APIs with ease.")
+}
+
+// Function to install and setup Envoy Gateway
+func installEnvoyGateway() {
 	// Install the Gateway API CRDs
 	if err := k8sUtils.ExecuteCommand(
 		k8sUtils.Kubectl,
@@ -87,8 +134,53 @@ func InstallPlatform() {
 	); err != nil {
 		utils.HandleErrorAndExit("Error creating the Gateway", err)
 	}
+}
 
-	fmt.Println("\nAll Done! We have configured APK to help you build and manage APIs with ease.")
+// Function to install and setup Control Plane components
+func installCPComponents(namespace string) {
+	// Add bitnami
+	if err := k8sUtils.ExecuteCommand(
+		utils.Helm,
+		utils.HelmRepo,
+		utils.HelmAdd,
+		"bitnami https://charts.bitnami.com/bitnami",
+	); err != nil {
+		utils.HandleErrorAndExit("Error encountered while adding bitnami Helm chart", err)
+	}
+
+	// Add chartmuseum
+	if err := k8sUtils.ExecuteCommand(
+		utils.Helm,
+		utils.HelmRepo,
+		utils.HelmAdd,
+		"chartmuseum http://localhost:8080",
+	); err != nil {
+		utils.HandleErrorAndExit("Error encountered while adding chartmuseum Helm chart", err)
+	}
+
+	// Download the dependent charts
+	if err := k8sUtils.ExecuteCommand(
+		utils.Helm,
+		utils.HelmDependencyBuild,
+	); err != nil {
+		utils.HandleErrorAndExit("Error encountered while executing the Helm dependency build command", err)
+	}
+
+	// Install the APK components
+	if err := k8sUtils.ExecuteCommand(
+		utils.Helm,
+		utils.HelmInstall,
+		utils.APKHelmChartReleaseName,
+		".",
+		"--set ipk.wso2.subscription.username=<username>",
+		"--set ipk.wso2.subscription.password=<password>",
+		"--set wso2.apk.cp.ipk.enabled=false", // to disable IPK temporarily
+		utils.HelmNamespaceFlag,
+		namespace,
+		utils.HelmCreateNamespaceFlag,
+	); err != nil {
+		utils.HandleErrorAndExit("Error encountered while installing Helm chart", err)
+	}
 }
 
 func getPodStatus() string {
