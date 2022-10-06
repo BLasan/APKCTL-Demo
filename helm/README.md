@@ -16,7 +16,7 @@
 ```HELM-HOME``` = APKCTL-demo/helm
 
 1. Execute ``` helm repo add bitnami https://charts.bitnami.com/bitnami ```
-2. Execute ``` helm repo add chartmuseum http://localhost:8080 ```
+2. Make sure your local chartmuseum docker container is running and execute ``` helm repo add chartmuseum http://localhost:8080 ```
 3. Clone the repo and cd into the ```HELM-HOME``` folder.
 4. Execute ``` helm dependency build ``` command to download the dependent charts.
 5. Now execute ```helm install apk-test . --set ipk.wso2.subscription.username=<username> --set ipk.wso2.subscription.password=<password>``` to install the APK components.
