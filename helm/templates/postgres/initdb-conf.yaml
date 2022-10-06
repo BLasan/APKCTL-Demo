@@ -18,6 +18,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-initdb-scripts-configmap
+  namespace: {{ .Release.Namespace }}
 data:
   setup1.sql: |
     DROP DATABASE IF EXISTS "WSO2AM_DB";
