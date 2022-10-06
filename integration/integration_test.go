@@ -1,9 +1,11 @@
 package integration
 
 import (
+	"os"
 	"testing"
 
 	"github.com/BLasan/APKCTL-Demo/integration/adminservices"
+	"github.com/BLasan/APKCTL-Demo/integration/base"
 	testutils "github.com/BLasan/APKCTL-Demo/integration/testUtils"
 )
 
@@ -68,5 +70,26 @@ const (
 )
 
 func TestMain(m *testing.M) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return
+	}
+
+	base.RelativeBinaryPath = dir + "/../"
+
+	deployBackendService()
+
 	m.Run()
+
+	removeBackendService()
+}
+
+func deployBackendService() {
+	args := []string{"apply", "-f", "testData/BackendService.yaml"}
+	base.ManageMicroservice(args...)
+}
+
+func removeBackendService() {
+	args := []string{"delete", "-f", "testData/BackendService.yaml"}
+	base.ManageMicroservice(args...)
 }

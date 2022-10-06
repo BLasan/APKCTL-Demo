@@ -7,5 +7,7 @@ var (
 	// BinaryName : Name of apictl binary
 	BinaryName = "apkctl"
 
-	archiveFileName string
+	K8sBinaryName = "kubectl"
+
+	// archiveFileName string
 )

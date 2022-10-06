@@ -32,6 +32,15 @@ func Execute(t *testing.T, args ...string) (string, error) {
 	return string(output), err
 }
 
+func ManageMicroservice(args ...string) (string, error) {
+	cmd := exec.Command(K8sBinaryName, args...)
+
+	// run command
+	output, err := cmd.Output()
+
+	return string(output), err
+}
+
 func GetExportedPathFromOutput(output string) string {
 	//Check directory path to omit changes due to OS differences
 	if strings.Contains(output, ":\\") {

@@ -38,3 +38,15 @@ func TestAPICreationtFromServiceURLWithDryRun(t *testing.T) {
 		testutils.CreateNewAPIFromBackendServiceURLWithDryRun(t)
 	})
 }
+
+func TestAPIConfigFiles(t *testing.T) {
+	t.Run("Validate values getting overriden in Swagger definition", func(t *testing.T) {
+		testutils.ValidateAPIConfigFiles(t)
+	})
+}
+
+func TestAPKComponentsUninstallation(t *testing.T) {
+	t.Run("Validate APK components are getting removed properly", func(t *testing.T) {
+		testutils.ValidateUninstallAPKComponents(t)
+	})
+}
