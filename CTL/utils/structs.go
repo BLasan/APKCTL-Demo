@@ -34,7 +34,7 @@ type MetaData struct {
 type HttpRouteSpec struct {
 	ParentRefs []ParentRef `yaml:"parentRefs"`
 	HostNames  []string    `yaml:"hostnames"`
-	Rules      []Rule      `ya	ml:"rules"`
+	Rules      []Rule      `yaml:"rules"`
 }
 
 type ParentRef struct {
