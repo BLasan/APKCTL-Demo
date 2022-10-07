@@ -32,7 +32,7 @@ func Execute(t *testing.T, args ...string) (string, error) {
 	return string(output), err
 }
 
-func ManageMicroservice(args ...string) (string, error) {
+func ExecuteKubernetesCommands(args ...string) (string, error) {
 	cmd := exec.Command(K8sBinaryName, args...)
 
 	// run command

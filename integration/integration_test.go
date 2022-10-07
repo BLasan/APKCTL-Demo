@@ -91,7 +91,7 @@ func deployBackendService() {
 
 	args := []string{"apply", "-f", filepath.Join(base.RelativeTargetDirPath, "testData/BackendService.yaml")}
 	fmt.Println("Args: ", args)
-	_, err := base.ManageMicroservice(args...)
+	_, err := base.ExecuteKubernetesCommands(args...)
 	if err != nil {
 		fmt.Println("Error while deploying the Backend Service")
 	}
@@ -101,7 +101,7 @@ func deployBackendService() {
 
 func removeBackendService() {
 	args := []string{"delete", "-f", filepath.Join(base.RelativeTargetDirPath, "testData/BackendService.yaml")}
-	_, err := base.ManageMicroservice(args...)
+	_, err := base.ExecuteKubernetesCommands(args...)
 	if err != nil {
 		fmt.Println("Error while removing the Backeend Service")
 	}
