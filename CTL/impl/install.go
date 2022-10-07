@@ -150,18 +150,18 @@ func installCPComponents(namespace string) {
 	}
 
 	// Add chartmuseum
-	if err := k8sUtils.ExecuteCommand(
-		utils.Helm,
-		utils.HelmRepo,
-		utils.HelmAdd,
-		"chartmuseum",
-		"http://localhost:8080",
-	); err != nil {
-		utils.HandleErrorAndExit("Error encountered while adding chartmuseum Helm chart", err)
-	}
+	// if err := k8sUtils.ExecuteCommand(
+	// 	utils.Helm,
+	// 	utils.HelmRepo,
+	// 	utils.HelmAdd,
+	// 	"chartmuseum",
+	// 	"http://localhost:8080",
+	// ); err != nil {
+	// 	utils.HandleErrorAndExit("Error encountered while adding chartmuseum Helm chart", err)
+	// }
 
 	// Change directory to APK Helm home
-	utils.ChangeDirectory("helm")
+	utils.ChangeDirectory("../helm")
 
 	// Download the dependent charts
 	if err := k8sUtils.ExecuteCommand(
@@ -178,21 +178,21 @@ func installCPComponents(namespace string) {
 		utils.HelmInstall,
 		utils.APKHelmChartReleaseName,
 		".",
-		utils.HelmSetFlag,
-		"ipk.wso2.subscription.username=<username>",
-		utils.HelmSetFlag,
-		"ipk.wso2.subscription.password=<password>",
-		utils.HelmSetFlag,
-		"wso2.apk.cp.ipk.enabled=false", // to disable IPK temporarily
 		utils.HelmNamespaceFlag,
 		namespace,
 		utils.HelmCreateNamespaceFlag,
+		// utils.HelmSetFlag,
+		// "ipk.wso2.subscription.username=<username>",
+		// utils.HelmSetFlag,
+		// "ipk.wso2.subscription.password=<password>",
+		utils.HelmSetFlag,
+		"wso2.apk.cp.ipk.enabled=false", // to disable IPK temporarily
 	); err != nil {
 		utils.HandleErrorAndExit("Error encountered while installing Helm chart", err)
 	}
 
 	// Change directory to APKCTL home
-	utils.ChangeDirectory("../")
+	utils.ChangeDirectory("../CTL")
 }
 
 func getPodStatus() string {

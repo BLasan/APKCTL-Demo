@@ -1,5 +1,5 @@
 # Directories generated for API projects
-target/
+CTL/target/
 
 # Directories generated for helm
 helm/charts/

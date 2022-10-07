@@ -21,14 +21,12 @@ To get started with APKCTL, you will need to have the prerequisites listed below
     * If you are using Minikube you can install ingress by running ```minikube addons enable ingress```
     * If you are using Rancher Desktop, use the folllowing [guide](https://kubernetes.github.io/ingress-nginx/deploy/#rancher-desktop)
 
-3. Follow IPK's 'Install from a chart repository' guide here : https://docs.google.com/document/d/1GJxX7BiYL44mfnCJtm-JfiuwrMmIGC-DkQI5YZ_93zk
-
 ### Clone and Setup APKCTL
 
 
 - Fork and clone/directly clone [this repo](https://github.com/BLasan/APKCTL-Demo).
 
-- Change directory to root directory of cloned repo.
+- Change directory to `<APKCTL_HOME> (i.e. APKCTL-Demo/CTL)` of cloned repo
 
 - Run the following command to build the ctl.
 
