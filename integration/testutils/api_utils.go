@@ -22,6 +22,16 @@ func AddNewAPIWithSwagger(t *testing.T, swagerPath string) {
 	assert.Nil(t, err, "Error while deploying API")
 	assert.Contains(t, out, "Successfully deployed")
 
+	args := []string{"get", "httproute"}
+
+	apiOut, err := base.ExecuteKubernetesCommands(args...)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	assert.Contains(t, apiOut, apiName+"-"+apiVersion)
+
 	t.Cleanup(func() {
 		removeAPI(t, apiName, apiVersion)
 	})
