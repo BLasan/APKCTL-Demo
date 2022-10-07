@@ -26,7 +26,7 @@ To get started with APKCTL, you will need to have the prerequisites listed below
 
 - Fork and clone/directly clone [this repo](https://github.com/BLasan/APKCTL-Demo).
 
-- Change directory to root directory of cloned repo.
+- Change directory to `<APKCTL_HOME> (i.e. APKCTL-Demo/CTL)` of cloned repo
 
 - Run the following command to build the ctl.
 

@@ -161,7 +161,7 @@ func installCPComponents(namespace string) {
 	// }
 
 	// Change directory to APK Helm home
-	utils.ChangeDirectory("helm")
+	utils.ChangeDirectory("../helm")
 
 	// Download the dependent charts
 	if err := k8sUtils.ExecuteCommand(
@@ -192,7 +192,7 @@ func installCPComponents(namespace string) {
 	}
 
 	// Change directory to APKCTL home
-	utils.ChangeDirectory("../")
+	utils.ChangeDirectory("../CTL")
 }
 
 func getPodStatus() string {
