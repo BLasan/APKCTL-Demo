@@ -28,6 +28,7 @@ var dpNamespace string
 var serviceUrl string
 var file string
 var isDryRun bool
+var applyNetworkPolicy bool
 
 const CreateAPICmdLiteral = "api"
 const CreateAPICmdShortDesc = "Create API and Deploy"
@@ -48,7 +49,7 @@ var CreateApiCmd = &cobra.Command{
 }
 
 func handleCreateApi(apiName string) {
-	impl.CreateAPI(file, dpNamespace, serviceUrl, apiName, version, isDryRun)
+	impl.CreateAPI(file, dpNamespace, serviceUrl, apiName, version, isDryRun, applyNetworkPolicy)
 }
 
 func init() {
@@ -58,4 +59,5 @@ func init() {
 	CreateApiCmd.Flags().StringVarP(&file, "file", "f", "", "Path to swagger/OAS definition/GraphQL SDL/WSDL")
 	CreateApiCmd.Flags().BoolVar(&isDryRun, "dry-run", false, "Generate API Project inclusive of an HTTPRouteConfig and a ConfigMap")
 	CreateApiCmd.Flags().StringVarP(&version, "version", "", "", "Version of the API")
+	CreateApiCmd.Flags().BoolVar(&applyNetworkPolicy, "restrict-service-access", false, "Create network policies to restrict access to backend")
 }
