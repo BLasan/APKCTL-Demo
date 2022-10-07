@@ -2,8 +2,5 @@ dependencies:
 - name: postgresql
   repository: https://charts.bitnami.com/bitnami
   version: 11.9.6
-- name: ipk
-  repository: http://localhost:8080
-  version: 6.0.0-1
-digest: sha256:9d0d25485d811909595bd008d17e37e622d51005d2294a2998dc4667168b58ac
-generated: "2022-10-07T00:29:20.459194+05:30"
+digest: sha256:990964a368c5ab7a425633045ac2a1dbba07222ce5e23e0b0a9e2e1db8f22d7d
+generated: "2022-10-07T11:40:37.24326+05:30"
