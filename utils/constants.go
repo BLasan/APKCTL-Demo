@@ -46,3 +46,18 @@ const (
 	HttpURLScheme  string = "http://"
 	HttpsURLScheme string = "https://"
 )
+
+// Constants used for Helm commands
+const Helm = "helm"
+const HelmInstall = "install"
+const HelmUninstall = "uninstall"
+const HelmRepo = "repo"
+const HelmAdd = "add"
+const HelmDependency = "dependency"
+const HelmBuild = "build"
+
+const HelmSetFlag = "--set"
+const HelmNamespaceFlag = "--namespace"
+const HelmCreateNamespaceFlag = "--create-namespace"
+
+const APKHelmChartReleaseName = "apk-test"

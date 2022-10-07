@@ -19,6 +19,7 @@
 package utils
 
 import (
+	"fmt"
 	"os"
 	"path"
 	"strings"
@@ -29,6 +30,11 @@ import (
 
 func GetAPKCTLHomeDir() (string, error) {
 	return os.Getwd()
+}
+
+func GetAPKHelmHomeDir() (string, error) {
+	pwd, err := os.Getwd()
+	return pwd + "/helm", err
 }
 
 // Retrieve name of the connected cluster
@@ -134,4 +140,14 @@ func CreateConfigMapFromTemplate(configmap ConfigMap, filepath string) {
 		HandleErrorAndExit("Error executing the template", err)
 	}
 
+}
+
+// changeDirectory will change the directory to the repoPath specified
+func ChangeDirectory(repoPath string) {
+	err := os.Chdir(repoPath)
+	if err != nil {
+		HandleErrorAndExit("Error while changing the current directory to " + repoPath, err)
+	}
+	pwd, _ := os.Getwd()
+	fmt.Println("Changed the current directory to " + pwd)
 }

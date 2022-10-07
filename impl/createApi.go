@@ -52,16 +52,9 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	}
 
 	apiContent, err := ioutil.ReadFile(filePath)
-	// fmt.Println("Bytes in String: ", string(apiContent))
 	if err != nil {
 		utils.HandleErrorAndExit("Error encountered while reading API definition file", err)
 	}
-
-	// var abc map[string]interface{}
-
-	// json.Unmarshal(apiContent, &abc)
-
-	// fmt.Println("ABC: ", abc)
 
 	definitionJsn, err := utils.ToJSON(apiContent)
 
@@ -80,26 +73,21 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 			utils.HandleErrorAndExit("Error unmarshalling swagger", err)
 		}
 
-		// // If version is not provided as a flag, use the version from the Swagger file
-		// if version == "" {
-		// 	version = swaggerSpec.Info.Version
-		// }
-
+		// If version is provided as a flag, modify the version in the Swagger file accordingly
 		if version != "" {
 			swaggerSpec.Info.Version = version
 		}
 
+		// Modify the API name in the Swagger file with the name from the create api command
 		if apiName != "" {
 			swaggerSpec.Info.Title = apiName
 		}
 
+		// If service URL is provided as a flag, modify the backend URL in the Swagger file accordingly
 		if serviceUrl != "" {
 			swaggerSpec.Host = serviceUrl
 		}
 
-		// updateSwagger(apiName, version, serviceUrl, definitionVersion, filePath, swaggerSpec)
-
-		// updateSwaggerUrl(&swaggerSpec, serviceUrl)
 		createAndDeploySwaggerAPI(swaggerSpec, filePath, namespace, serviceUrl, isDryRun)
 
 	} else if definitionVersion == utils.OpenAPI3 {
@@ -111,26 +99,21 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 			utils.HandleErrorAndExit("Error unmarshalling OpenAPI Definition", err)
 		}
 
-		// // If version is not provided as a flag, use the version from the OpenAPI Definition file
-		// if version == "" {
-		// 	version = openAPISpec.Info.Version
-		// }
-
+		// If version is provided as a flag, modify the version in the OpenAPI definition accordingly
 		if version != "" {
 			openAPISpec.Info.Version = version
 		}
 
+		// Modify the API name in the OpenAPI definition with the name from the create api command
 		if apiName != "" {
 			openAPISpec.Info.Title = apiName
 		}
 
+		// If service URL is provided as a flag, modify the backend URL in the OpenAPI definition accordingly
 		if serviceUrl != "" {
 			openAPISpec.Servers[0].URL = serviceUrl
 		}
 
-		// updateSwagger(apiName, version, serviceUrl, definitionVersion, filePath, swaggerSpec)
-
-		// updateOpenAPIDefWithServerUrl(&openAPISpec, serviceUrl)
 		createAndDeployOpenAPI(openAPISpec, filePath, namespace, serviceUrl, apiName, isDryRun)
 
 	} else {
@@ -258,11 +241,6 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 		utils.HandleErrorAndExit("Error marshalling httproute file", err)
 	}
 
-	// configmap.Name = apiName + "-" + "configmap"
-	// configmap.Namespace = namespace
-	// configmap.File = filePath
-	// configmap.SwaggerContent = readSwaggerDef(filePath)
-
 	if !isDryRun {
 		handleDeploy(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec, utils.Swagger2)
 	} else {
@@ -366,11 +344,6 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	if err != nil {
 		utils.HandleErrorAndExit("Error marshalling httproute file.", err)
 	}
-
-	// configmap.Name = apiName + "-" + "configmap"
-	// configmap.Namespace = namespace
-	// configmap.File = filePath
-	// configmap.SwaggerContent = readSwaggerDef(filePath)
 
 	version := openAPISpec.Info.Version
 
@@ -502,104 +475,3 @@ func createConfigMap(ext, dirPath, namespace, apiname string, definition interfa
 		utils.HandleErrorAndExit("Error creating config file", err)
 	}
 }
-
-// func readSwaggerDef(filename string) string {
-// 	if info, err := os.Stat(filename); err == nil && !info.IsDir() {
-// 		content, err := ioutil.ReadFile(filename)
-// 		if err != nil {
-// 			utils.HandleErrorAndExit("Error Reading Swagger File", err)
-// 		}
-// 		return string(content)
-// 	}
-
-// 	return ""
-// }
-
-// func updateSwagger(apiName, apiVersion, serviceUrl, swaggerVersion, filePath string, definition interface{}) {
-// 	// result := yaml.MapSlice{}
-
-// 	// err := yaml.Unmarshal(content, &result)
-// 	// if err != nil {
-// 	// 	utils.HandleErrorAndExit("Error while JSON unmarshalling to find the API definition version.", err)
-// 	// }
-
-// 	// // fmt.Println("YAML: ", result)
-
-// 	// info := make(map[string]interface{})
-
-// 	// info["title"] = apiName
-
-// 	// obj := yaml.MapItem{
-// 	// 	"info", info,
-// 	// }
-
-// 	// for _, item := range result {
-// 	// 	if item.Key == "info" {
-// 	// 		item = obj
-// 	// 		fmt.Println("Object: ", item)
-// 	// 		// fmt.Println("Item: ", obj.Title)
-// 	// 	}
-
-// 	// 	// obj := item.Value.(map[string]interface{})
-// 	// 	// fmt.Println("Object: ", obj)
-// 	// 	// if item.Key == "info" {
-// 	// 	// 	if apiName != "" {
-// 	// 	// 		obj["title"] = apiName
-// 	// 	// 	}
-
-// 	// 	// 	if apiVersion != "" {
-// 	// 	// 		obj["version"] = apiVersion
-// 	// 	// 	}
-
-// 	// 	// 	if serviceUrl != "" {
-// 	// 	// 		if swaggerVersion == utils.Swagger2 {
-// 	// 	// 			obj["host"] = serviceUrl
-// 	// 	// 		} else if swaggerVersion == utils.OpenAPI3 {
-// 	// 	// 			servers := obj["servers"].([]map[string]interface{})
-// 	// 	// 			servers[0]["url"] = serviceUrl
-// 	// 	// 		}
-// 	// 	// 	}
-// 	// 	// }
-// 	// }
-
-// 	// var info map[string]interface{}
-// 	// info = result["info"].(map[string]interface{})
-
-// 	// if apiName != "" {
-// 	// 	info["title"] = apiName
-// 	// }
-
-// 	// if apiVersion != "" {
-// 	// 	info["version"] = apiVersion
-// 	// }
-
-// 	// if serviceUrl != "" {
-// 	// 	if swaggerVersion == utils.Swagger2 {
-// 	// 		result["host"] = serviceUrl
-// 	// 	} else if swaggerVersion == utils.OpenAPI3 {
-// 	// 		var servers []map[string]interface{}
-// 	// 		servers = result["servers"].([]map[string]interface{})
-// 	// 		servers[0]["url"] = serviceUrl
-// 	// 	}
-// 	// }
-
-// 	file, err := yaml.Marshal(&result)
-
-// 	if err != nil {
-// 		utils.HandleErrorAndExit("Error Marshalling Swagger Interface", err)
-// 	}
-
-// 	err = ioutil.WriteFile(filePath, file, 0644)
-// }
-
-// func updateSwaggerUrl(swagger *spec.Swagger, serviceUrl string) {
-// 	if serviceUrl != "" {
-// 		swagger.Host = serviceUrl
-// 	}
-// }
-
-// func updateOpenAPIUrl(openapi *openapi3.T, serviceUrl string) {
-// 	if serviceUrl != "" {
-// 		openapi.Servers[0].URL = serviceUrl
-// 	}
-// }

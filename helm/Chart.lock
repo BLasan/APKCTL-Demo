@@ -3,7 +3,7 @@ dependencies:
   repository: https://charts.bitnami.com/bitnami
   version: 11.9.6
 - name: ipk
-  repository: http://localhost:8082
+  repository: http://localhost:8080
   version: 6.0.0-1
-digest: sha256:0b4e5c3c8d87f5c96baef3e42bb52cd02cb61149357ba11ec63b1e59095c0d2c
-generated: "2022-10-05T13:27:25.526523087+05:30"
+digest: sha256:9d0d25485d811909595bd008d17e37e622d51005d2294a2998dc4667168b58ac
+generated: "2022-10-07T00:29:20.459194+05:30"

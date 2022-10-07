@@ -39,7 +39,6 @@ var RootCmd = &cobra.Command{
 
 func execute() {
 	if err := RootCmd.Execute(); err != nil {
-		// klog.Errorf("help: %v", err)
 		os.Exit(1)
 	}
 }
