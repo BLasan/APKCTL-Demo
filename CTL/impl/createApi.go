@@ -42,16 +42,16 @@ var desFilePath string
 
 func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) {
 
+	var apiContent []byte
+	var err error
+
 	// Checking if path to API definition is provided. If not specified, use the default OpenAPI definition
 	if filePath == "" {
-		dir, err := utils.GetAPKCTLHomeDir()
-		if err != nil {
-			utils.HandleErrorAndExit("Error getting the working directory", err)
-		}
-		filePath = filepath.Join(dir, utils.SampleResources, utils.DefaultSwagger)
+		apiContent = []byte(utils.DefaultSwaggerFile)
+	} else {
+		apiContent, err = ioutil.ReadFile(filePath)
 	}
 
-	apiContent, err := ioutil.ReadFile(filePath)
 	if err != nil {
 		utils.HandleErrorAndExit("Error encountered while reading API definition file", err)
 	}
@@ -373,6 +373,11 @@ func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version stri
 		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
 	}
 
+	// set the file name to get the file extension
+	if swaggerFilePath == "" {
+		swaggerFilePath = utils.DefaultSwaggerFileName
+	}
+
 	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion, version)
 	// utils.CreateConfigMapFromTemplate(configmap, dirPath)
 
@@ -408,6 +413,11 @@ func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version stri
 
 	if err != nil {
 		utils.HandleErrorAndExit("Error creating HTTPRouteConfig file", err)
+	}
+
+	// set the file name to get the file extension
+	if swaggerFilePath == "" {
+		swaggerFilePath = utils.DefaultSwaggerFileName
 	}
 
 	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion, version)

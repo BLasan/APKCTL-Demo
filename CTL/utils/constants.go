@@ -61,3 +61,4 @@ const HelmNamespaceFlag = "--namespace"
 const HelmCreateNamespaceFlag = "--create-namespace"
 
 const APKHelmChartReleaseName = "apk-test"
+const DefaultSwaggerFileName = "DefaultSwagger.yaml"
