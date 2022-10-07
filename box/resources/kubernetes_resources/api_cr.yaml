@@ -1,8 +1,0 @@
-apiVersion: wso2.com/v1alpha2
-kind: API
-metadata:
-  name:
-spec:
-  swaggerConfigMapName:
-  paramsValues:
-  certsValues:

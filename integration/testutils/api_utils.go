@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/BLasan/APKCTL-Demo/integration/base"
+	"github.com/BLasan/APKCTL-Demo/CTL/integration/base"
 	"github.com/stretchr/testify/assert"
 	"gopkg.in/yaml.v2"
 )

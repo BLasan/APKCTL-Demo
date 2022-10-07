@@ -30,8 +30,8 @@ import (
 
 	"net/url"
 
-	k8sUtils "github.com/BLasan/APKCTL-Demo/k8s"
-	"github.com/BLasan/APKCTL-Demo/utils"
+	k8sUtils "github.com/BLasan/APKCTL-Demo/CTL/k8s"
+	"github.com/BLasan/APKCTL-Demo/CTL/utils"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-openapi/spec"
 	"gopkg.in/yaml.v2"
