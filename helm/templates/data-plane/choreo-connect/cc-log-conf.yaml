@@ -1,3 +1,4 @@
+{{- if .Values.wso2.apk.dp.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -762,3 +763,4 @@ data:
     rootLogger.appenderRef.ENFORCER_CONSOLE.ref = ENFORCER_CONSOLE
     rootLogger.appenderRef.ENFORCER_LOGFILE.ref = ENFORCER_LOGFILE
     rootLogger.appenderRef.ENFORCER_ACCESS_LOG.ref = ENFORCER_ACCESS_LOG
+{{- end -}}

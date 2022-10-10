@@ -53,6 +53,11 @@ spec:
               mountPath: /home/wso2/security/truststore/consul
             - name: cc-log-conf-volume
               mountPath: /home/wso2/conf/
+          readinessProbe:
+            exec:
+              command: [ "sh", "check_health.sh" ]
+            initialDelaySeconds: 8
+            periodSeconds: 5
       volumes: 
         - name: cc-adapter-keystore-secret-volume
           secret: 

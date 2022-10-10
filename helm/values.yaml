@@ -259,10 +259,8 @@ wso2:
                 ROUTER_LABEL: Default
                 ROUTER_PRIVATE_KEY_PATH: /home/wso2/security/keystore/mg.key
                 ROUTER_PUBLIC_CERT_PATH: /home/wso2/security/keystore/mg.pem
-                ADAPTER_HOST: adapter
                 ADAPTER_PORT: "18000"
                 ADAPTER_CA_CERT_PATH: /home/wso2/security/truststore/mg.pem
-                ENFORCER_HOST: enforcer
                 ENFORCER_PORT: "8081"
                 ENFORCER_ANALYTICS_RECEIVER_PORT: "18090"
                 ENFORCER_CA_CERT_PATH: /home/wso2/security/truststore/mg.pem
@@ -298,8 +296,6 @@ wso2:
               ENFORCER_PRIVATE_KEY_PATH: /home/wso2/security/keystore/mg.key
               ENFORCER_PUBLIC_CERT_PATH: /home/wso2/security/keystore/mg.pem
               TRUSTED_CA_CERTS_PATH: /home/wso2/security/truststore
-              ADAPTER_HOST_NAME: adapter
-              ADAPTER_HOST: adapter
               ADAPTER_XDS_PORT: "18000"
               ENFORCER_LABEL: Default
               ENFORCER_REGION: UNKNOWN
@@ -310,6 +306,7 @@ wso2:
               tm_admin_pwd: admin
               analytics_authURL: https://localhost:8080
               analytics_authToken: 
+              JAVA_OPTS: -Dhttpclient.hostnameVerifier=AllowAll -Xms512m -Xmx512m -XX:MaxRAMFraction=2
             readinessProbe:
               path: /api/am/devportal/v2/apis?limit=2&offset=2
               port: 9443

@@ -44,6 +44,10 @@ spec:
               protocol: "TCP"
 {{ include "apk-helm.deployment.resources" .Values.wso2.apk.dp.cc.enforcer.deployment.resources | indent 10 }}
 {{ include "apk-helm.deployment.env" .Values.wso2.apk.dp.cc.enforcer.deployment.env | indent 10 }}
+            - name: ADAPTER_HOST_NAME
+              value: {{ template "apk-helm.resource.prefix" . }}-cc-adapter-service
+            - name: ADAPTER_HOST
+              value: {{ template "apk-helm.resource.prefix" . }}-cc-adapter-service
           volumeMounts:
             - name: cc-enforcer-keystore-secret-volume
               mountPath: /home/wso2/security/keystore
@@ -51,6 +55,11 @@ spec:
               mountPath: /home/wso2/security/truststore
             - name: cc-log-conf-volume
               mountPath: /home/wso2/conf/
+          readinessProbe:
+            exec:
+              command: [ "sh", "check_health.sh" ]
+            initialDelaySeconds: 5
+            periodSeconds: 5
       volumes: 
         - name: cc-enforcer-keystore-secret-volume
           secret: 
