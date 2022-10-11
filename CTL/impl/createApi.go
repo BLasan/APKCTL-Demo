@@ -40,7 +40,7 @@ import (
 var dirPath string
 var desFilePath string
 
-func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool) {
+func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun, applyNetworkPolicy bool) {
 
 	var apiContent []byte
 	var err error
@@ -88,7 +88,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 			swaggerSpec.Host = serviceUrl
 		}
 
-		createAndDeploySwaggerAPI(swaggerSpec, filePath, namespace, serviceUrl, isDryRun)
+		createAndDeploySwaggerAPI(swaggerSpec, filePath, namespace, serviceUrl, isDryRun, applyNetworkPolicy)
 
 	} else if definitionVersion == utils.OpenAPI3 {
 
@@ -114,14 +114,14 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 			openAPISpec.Servers[0].URL = serviceUrl
 		}
 
-		createAndDeployOpenAPI(openAPISpec, filePath, namespace, serviceUrl, apiName, isDryRun)
+		createAndDeployOpenAPI(openAPISpec, filePath, namespace, serviceUrl, apiName, isDryRun, applyNetworkPolicy)
 
 	} else {
 		utils.HandleErrorAndExit("Error resolving API definition. Provided file kind is not supported or not acceptable.", nil)
 	}
 }
 
-func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, serviceUrl string, isDryRun bool) {
+func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, serviceUrl string, isDryRun, applyNetworkPolicy bool) {
 	httpRoute := utils.HTTPRouteConfig{}
 	var parentRef utils.ParentRef
 
@@ -242,13 +242,13 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	}
 
 	if !isDryRun {
-		handleDeploy(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec, utils.Swagger2)
+		handleDeploy(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec, utils.Swagger2, parsedURL, applyNetworkPolicy)
 	} else {
-		handleDryRun(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec, utils.Swagger2)
+		handleDryRun(file, filePath, namespace, swaggerSpec.Info.Title, swaggerSpec.Info.Version, swaggerSpec, utils.Swagger2, parsedURL, applyNetworkPolicy)
 	}
 }
 
-func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, serviceUrl, apiName string, isDryRun bool) {
+func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, serviceUrl, apiName string, isDryRun, applyNetworkPolicy bool) {
 	httpRoute := utils.HTTPRouteConfig{}
 	var parentRef utils.ParentRef
 
@@ -348,14 +348,83 @@ func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, service
 	version := openAPISpec.Info.Version
 
 	if !isDryRun {
-		handleDeploy(file, filePath, namespace, apiName, version, openAPISpec, utils.OpenAPI3)
+		handleDeploy(file, filePath, namespace, apiName, version, openAPISpec, utils.OpenAPI3, parsedURL, applyNetworkPolicy)
 	} else {
-		handleDryRun(file, filePath, namespace, apiName, version, openAPISpec, utils.OpenAPI3)
+		handleDryRun(file, filePath, namespace, apiName, version, openAPISpec, utils.OpenAPI3, parsedURL, applyNetworkPolicy)
 	}
 }
 
+func handleApplyNetworkPolicy(apiName string, serviceUrl *url.URL, dirPath string) {
+	service := strings.Split(serviceUrl.Host, ".")[0]
+	namespace := strings.Split(serviceUrl.Host, ".")[1]
+	dnsType := strings.Split(serviceUrl.Host, ".")[2]
+
+	if dnsType == "svc" {
+		out, err := k8sUtils.GetCommandOutput(k8sUtils.Kubectl, k8sUtils.K8sGet, k8sUtils.K8sService, service, "-n", namespace, "-o", "wide")
+		if err != nil {
+			utils.HandleErrorAndExit("Error executing K8s command", err)
+		} else {
+			fmt.Println(out)
+			selectors := strings.Fields(strings.SplitAfter(out, "\n")[1])[6]
+			stringSlice := strings.Split(selectors, ",")
+			labelMap := make(map[string]string)
+
+			for _, element := range stringSlice {
+				labelSlice := strings.Split(element, "=")
+				labelMap[labelSlice[0]] = labelSlice[1]
+			}
+
+			file := createNetworkPolicy(apiName, labelMap)
+			nwpFilePath := filepath.Join(dirPath, "NetworkPolicy.yaml")
+
+			err = ioutil.WriteFile(nwpFilePath, file, 0644)
+
+			if err != nil {
+				utils.HandleErrorAndExit("Error creating NetworkPolicy file", err)
+			}
+		}
+	}
+}
+
+func createNetworkPolicy(apiName string, selectors map[string]string) []byte {
+	networkPolicy := utils.NetworkPolicy{}
+	var metadata utils.MetaData
+	var networkPolicySpec utils.NetworkPolicySpec
+	var podSelector utils.PodSelector
+	var ingress utils.Ingress
+	var from utils.From
+	var namespaceSelector utils.NamespaceSelector
+
+	networkPolicy.Kind = "NetworkPolicy"
+	networkPolicy.ApiVersion = "networking.k8s.io/v1"
+
+	metadata.Name = strings.ToLower(apiName + "NetworkPolicy")
+	networkPolicy.MetaData = metadata
+
+	podSelector.MatchLabels = selectors
+
+	networkPolicySpec.PodSelector = podSelector
+
+	nsSMap := make(map[string]string)
+	nsSMap["gw"] = "envoy"
+
+	namespaceSelector.MatchLabels = nsSMap
+	from.NamespaceSelector = namespaceSelector
+	ingress.From = append(ingress.From, from)
+	networkPolicySpec.Ingress = append(networkPolicySpec.Ingress, ingress)
+
+	networkPolicy.NetworkPolicySpec = networkPolicySpec
+
+	file, err := yaml.Marshal(&networkPolicy)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	return file
+}
+
 // Handle API deploy
-func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}, swaggerVersion string) {
+func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}, swaggerVersion string, serviceUrl *url.URL, applyNetworkPolicy bool) {
 	var err error
 	apiProjectDirName := apiName + "-" + version
 	dirPath, err = os.MkdirTemp("", apiProjectDirName)
@@ -378,6 +447,10 @@ func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version stri
 		swaggerFilePath = utils.DefaultSwaggerFileName
 	}
 
+	if applyNetworkPolicy {
+		handleApplyNetworkPolicy(apiName, serviceUrl, dirPath)
+	}
+
 	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion, version)
 	// utils.CreateConfigMapFromTemplate(configmap, dirPath)
 
@@ -394,7 +467,7 @@ func handleDeploy(file []byte, swaggerFilePath, namespace, apiName, version stri
 
 // Handle the `Dry Run` option of create API command
 // This will generate an API project based on the provided command and flags
-func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}, swaggerVersion string) {
+func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version string, definition interface{}, swaggerVersion string, serviceUrl *url.URL, applyNetworkPolicy bool) {
 	var err error
 	dirPath, err = utils.GetAPKCTLHomeDir()
 	if err != nil {
@@ -418,6 +491,10 @@ func handleDryRun(file []byte, swaggerFilePath, namespace, apiName, version stri
 	// set the file name to get the file extension
 	if swaggerFilePath == "" {
 		swaggerFilePath = utils.DefaultSwaggerFileName
+	}
+
+	if applyNetworkPolicy {
+		handleApplyNetworkPolicy(apiName, serviceUrl, dirPath)
 	}
 
 	createConfigMap(filepath.Ext(swaggerFilePath), dirPath, namespace, apiName, definition, swaggerVersion, version)
