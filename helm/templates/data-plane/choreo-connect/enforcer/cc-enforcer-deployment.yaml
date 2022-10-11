@@ -45,7 +45,7 @@ spec:
 {{ include "apk-helm.deployment.resources" .Values.wso2.apk.dp.cc.enforcer.deployment.resources | indent 10 }}
 {{ include "apk-helm.deployment.env" .Values.wso2.apk.dp.cc.enforcer.deployment.env | indent 10 }}
             - name: ADAPTER_HOST_NAME
-              value: {{ template "apk-helm.resource.prefix" . }}-cc-adapter-service
+              value: adapter
             - name: ADAPTER_HOST
               value: {{ template "apk-helm.resource.prefix" . }}-cc-adapter-service
           volumeMounts:
