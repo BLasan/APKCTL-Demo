@@ -40,7 +40,7 @@ import (
 var dirPath string
 var desFilePath string
 
-func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun bool, applyNetworkPolicy bool) {
+func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRun, applyNetworkPolicy bool) {
 
 	var apiContent []byte
 	var err error
@@ -121,7 +121,7 @@ func CreateAPI(filePath, namespace, serviceUrl, apiName, version string, isDryRu
 	}
 }
 
-func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, serviceUrl string, isDryRun bool, applyNetworkPolicy bool) {
+func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, serviceUrl string, isDryRun, applyNetworkPolicy bool) {
 	httpRoute := utils.HTTPRouteConfig{}
 	var parentRef utils.ParentRef
 
@@ -248,7 +248,7 @@ func createAndDeploySwaggerAPI(swaggerSpec spec.Swagger, filePath, namespace, se
 	}
 }
 
-func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, serviceUrl, apiName string, isDryRun bool, applyNetworkPolicy bool) {
+func createAndDeployOpenAPI(openAPISpec openapi3.T, filePath, namespace, serviceUrl, apiName string, isDryRun, applyNetworkPolicy bool) {
 	httpRoute := utils.HTTPRouteConfig{}
 	var parentRef utils.ParentRef
 
