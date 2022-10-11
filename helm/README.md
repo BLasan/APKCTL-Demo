@@ -22,3 +22,6 @@
 5. Now execute ```helm install apk-test . --set ipk.wso2.subscription.username=<username> --set ipk.wso2.subscription.password=<password>``` to install the APK components.
 6. If you dont want to spin up postgres db : use ```  --set wso2.apk.cp.postgresql.enabled=false ``` in the helm install command
 7. If you dont want to spin up IPK components : use ```   --set wso2.apk.cp.ipk.enabled=false ``` in the helm install command
+8. To deploy control plane components only use ``` --set wso2.apk.dp.enabled=false ```
+9. To deploy data plane components only use ``` --set wso2.apk.cp.enabled=false --set wso2.apk.cp.postgresql.enabled=false --set wso2.apk.cp.ipk.enabled=false ```
+10. 
