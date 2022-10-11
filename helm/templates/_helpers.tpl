@@ -33,7 +33,7 @@ app.kubernetes.io/release: {{ .root.Release.Name }}
 {{- end }}
 
 
-{{- define "apl-helm.deployment.readinessProbe.http" -}}
+{{- define "apk-helm.deployment.readinessProbe.http" -}}
 readinessProbe:
   httpGet:
     path: {{ .readinessProbe.path }}
@@ -43,7 +43,7 @@ readinessProbe:
   failureThreshold: {{ .readinessProbe.failureThreshold }}
 {{- end }}
 
-{{- define "apl-helm.deployment.livenessProbe.http" -}}
+{{- define "apk-helm.deployment.livenessProbe.http" -}}
 livenessProbe:
   httpGet:
     path: {{ .livenessProbe.path }}
@@ -53,7 +53,7 @@ livenessProbe:
   failureThreshold: {{ .livenessProbe.failureThreshold }}
 {{- end }}
 
-{{- define "apl-helm.deployment.resources" -}}
+{{- define "apk-helm.deployment.resources" -}}
 resources:
   requests:
     memory: {{ .requests.memory }}
@@ -67,6 +67,19 @@ resources:
 {{/*
 Common prefix prepended to Kubernetes resources of this chart
 */}}
-{{- define "apk.resource.prefix" -}}
-{{- printf "%s-wso2-apk" .Release.Name }}
+{{- define "apk-helm.resource.prefix" -}}
+{{- printf "%s-wso2-apk" .Release.Name -}}
+{{- end -}}
+
+
+
+
+{{- define "apk-helm.deployment.env" -}}
+{{- if . -}}
+env:
+{{- range $key, $val := . }}
+  - name: {{ $key }}
+    value: {{ quote  $val }}
+{{- end }}
+{{- end -}}
 {{- end -}}
