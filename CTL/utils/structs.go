@@ -34,7 +34,7 @@ type MetaData struct {
 type HttpRouteSpec struct {
 	ParentRefs []ParentRef `yaml:"parentRefs"`
 	HostNames  []string    `yaml:"hostnames"`
-	Rules      []Rule      `yaml:"rules"`
+	Rules      []Rule      `ya	ml:"rules"`
 }
 
 type ParentRef struct {
@@ -90,6 +90,38 @@ type SwaggerInfo struct {
 	Description string `yaml:"description"`
 	Version     string `yaml:"version"`
 	Title       string `yaml:"title"`
+}
+
+type NetworkPolicy struct {
+	ApiVersion        string            `yaml:"apiVersion"`
+	Kind              string            `yaml:"kind"`
+	MetaData          MetaData          `yaml:"metadata"`
+	NetworkPolicySpec NetworkPolicySpec `yaml:"spec"`
+}
+
+type NetworkPolicySpec struct {
+	PodSelector PodSelector `yaml:"podSelector"`
+	Ingress     []Ingress   `yaml:"ingress"`
+}
+
+type PodSelector struct {
+	MatchLabels map[string]string `yaml:"matchLabels"`
+}
+
+type MatchLabels struct {
+	Data map[string]string `yaml:"data"`
+}
+
+type Ingress struct {
+	From []From `yaml:"from"`
+}
+
+type From struct {
+	NamespaceSelector NamespaceSelector `yaml:"namespaceSelector"`
+}
+
+type NamespaceSelector struct {
+	MatchLabels map[string]string `yaml:"matchLabels"`
 }
 
 // type ConfigMap struct {
