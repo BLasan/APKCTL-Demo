@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/BLasan/APKCTL-Demo/CTL/integration/base"
 	testutils "github.com/BLasan/APKCTL-Demo/CTL/integration/testUtils"
 )
 
@@ -15,7 +16,7 @@ func TestInstallAPKComponents(t *testing.T) {
 
 func TestAPICreationtFromSwaggerWithDryRun(t *testing.T) {
 	t.Run("Create API without deploying with a Swagger File", func(t *testing.T) {
-		swaggerPath := filepath.Join(testutils.SampleTestData, testutils.SampleTestSwaggerFile)
+		swaggerPath := filepath.Join(base.RelativeTestDirPath, testutils.SampleTestData, testutils.SampleTestSwaggerFile)
 		testutils.CreateNewAPIFromSwaggerWithDryRun(t, swaggerPath)
 	})
 }
@@ -28,7 +29,7 @@ func TestAPICreationtFromServiceURLWithDryRun(t *testing.T) {
 
 func TestAPIDeploymentFromSwagger(t *testing.T) {
 	t.Run("Deploy API with a Swagger File", func(t *testing.T) {
-		swaggerPath := filepath.Join(testutils.SampleTestData, testutils.SampleTestSwaggerFile)
+		swaggerPath := filepath.Join(base.RelativeTestDirPath, testutils.SampleTestData, testutils.SampleTestSwaggerFile)
 		testutils.AddNewAPIWithSwagger(t, swaggerPath)
 	})
 }

@@ -71,14 +71,23 @@ const (
 	TENANT1               = adminservices.Tenant1
 )
 
+var backendServicePath string
+
 func TestMain(m *testing.M) {
+	os.Chdir("../")
 	dir, err := os.Getwd()
 	if err != nil {
 		return
 	}
 
-	base.RelativeBinaryPath = dir + "/../"
-	base.RelativeTargetDirPath = dir
+	base.RelativeBinaryPath = dir
+	base.RelativeTestDirPath = dir + "/integration"
+
+	backendServicePath = filepath.Join(base.RelativeTestDirPath, "testData/BackendService.yaml")
+
+	// fmt.Println("Relative Binary Path: ", base.RelativeBinaryPath)
+
+	checkK8sClusterAvailability()
 
 	deployBackendService()
 
@@ -89,20 +98,31 @@ func TestMain(m *testing.M) {
 
 func deployBackendService() {
 
-	args := []string{"apply", "-f", filepath.Join(base.RelativeTargetDirPath, "testData/BackendService.yaml")}
-	fmt.Println("Args: ", args)
-	_, err := base.ExecuteKubernetesCommands(args...)
+	args := []string{"apply", "-f", backendServicePath}
+	// fmt.Println("Args: ", args)
+	out, err := base.ExecuteKubernetesCommands(args...)
 	if err != nil {
-		fmt.Println("Error while deploying the Backend Service")
+		fmt.Println(out)
+		os.Exit(1)
 	}
 
 	// fmt.Println("Output: ", out)
 }
 
 func removeBackendService() {
-	args := []string{"delete", "-f", filepath.Join(base.RelativeTargetDirPath, "testData/BackendService.yaml")}
-	_, err := base.ExecuteKubernetesCommands(args...)
+	args := []string{"delete", "-f", backendServicePath}
+	out, err := base.ExecuteKubernetesCommands(args...)
 	if err != nil {
-		fmt.Println("Error while removing the Backeend Service")
+		fmt.Println(out)
+		os.Exit(1)
+	}
+}
+
+func checkK8sClusterAvailability() {
+	args := []string{"get", "cluster"}
+	out, err := base.ExecuteKubernetesCommands(args...)
+	if err != nil {
+		fmt.Println(out)
+		os.Exit(1)
 	}
 }

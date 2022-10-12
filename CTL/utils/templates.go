@@ -19,7 +19,7 @@ data:
 const DefaultSwaggerFile = `openapi: 3.0.1
 info:
   title: Default
-  version: '1'
+  version: '1.0.0'
 servers:
   - url: /
 security:

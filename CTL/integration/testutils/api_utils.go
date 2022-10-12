@@ -50,14 +50,14 @@ func CreateNewAPIFromSwaggerWithDryRun(t *testing.T, swagerPath string) {
 
 	fmt.Println("Project Dir: ", apiProjectDir)
 
-	httprouteconfig := filepath.Join(base.RelativeTargetDirPath, apiProjectDir, HttpRouteConfigFile)
+	httprouteconfig := filepath.Join(base.RelativeBinaryPath, apiProjectDir, HttpRouteConfigFile)
 
-	configmap := filepath.Join(base.RelativeTargetDirPath, apiProjectDir, ConfigMapFile)
+	configmap := filepath.Join(base.RelativeBinaryPath, apiProjectDir, ConfigMapFile)
 
 	assert.True(t, base.IsFileAvailable(t, httprouteconfig), "HttpRouteConfig is not available")
 	assert.True(t, base.IsFileAvailable(t, configmap), "ConfigMap is not available")
 
-	removeAll(t, filepath.Join(base.RelativeTargetDirPath, apiProjectDir+"../../../"))
+	removeAll(t, filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../"))
 
 	// removeFile(t, httprouteconfig)
 	// removeFile(t, configmap)
@@ -65,7 +65,7 @@ func CreateNewAPIFromSwaggerWithDryRun(t *testing.T, swagerPath string) {
 
 func AddNewAPIWithBackendServiceURL(t *testing.T) {
 	t.Helper()
-	apiName := base.GenerateRandomName(15) + "API"
+	apiName := APIName
 	apiVersion := APIVersion
 	out, err := deployAPIWithBackendServiceURL(t, apiName, apiVersion, BackendServiceURL)
 
@@ -84,15 +84,17 @@ func CreateNewAPIFromBackendServiceURLWithDryRun(t *testing.T) {
 
 	apiProjectDir := base.GetExportedPathFromOutput(out)
 
-	httprouteconfig := filepath.Join(base.RelativeTargetDirPath, apiProjectDir, HttpRouteConfigFile)
-	configmap := filepath.Join(base.RelativeTargetDirPath, apiProjectDir, ConfigMapFile)
+	httprouteconfig := filepath.Join(base.RelativeBinaryPath, apiProjectDir, HttpRouteConfigFile)
+	configmap := filepath.Join(base.RelativeBinaryPath, apiProjectDir, ConfigMapFile)
 
 	assert.True(t, base.IsFileAvailable(t, httprouteconfig), "HttpRouteConfig is not available")
 	assert.True(t, base.IsFileAvailable(t, configmap), "ConfigMap is not available")
 
-	absPath := filepath.Join(base.RelativeTargetDirPath, apiProjectDir+"../../../")
+	absPath := filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../")
 
-	removeAll(t, absPath)
+	t.Cleanup(func() {
+		removeAll(t, absPath)
+	})
 
 	// removeFile(t, httprouteconfig)
 	// removeFile(t, configmap)
@@ -128,7 +130,7 @@ func ValidateAPIConfigFiles(t *testing.T) {
 	apiVersion := APIVersion
 	out, err := createAPIWithBackendServiceURL(t, apiName, apiVersion, BackendServiceURL)
 
-	assert.Nil(t, err, "Error while creating AP from Backend Service URL")
+	assert.Nil(t, err, "Error while creating API from Backend Service URL")
 	assert.Contains(t, out, "Successfully created")
 
 	apiProjectDir := base.GetExportedPathFromOutput(out)
@@ -136,6 +138,11 @@ func ValidateAPIConfigFiles(t *testing.T) {
 	configmap := filepath.Join(apiProjectDir, ConfigMapFile)
 
 	validateAPIRelatedFiles(t, httprouteconfig, configmap)
+
+	t.Cleanup(func() {
+		absPath := filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../")
+		removeAll(t, absPath)
+	})
 
 }
 
@@ -168,8 +175,8 @@ func validateAPIRelatedFiles(t *testing.T, httprouteconfig, configmap string) {
 	httprouteconfigContent := readAPIRelatedFiles(t, httprouteconfig)
 	configmapContent := readAPIRelatedFiles(t, configmap)
 
-	httprouteconfigContentExpected := readAPIRelatedFiles(t, SampleHttpRouteConfig)
-	configmapContentExpected := readAPIRelatedFiles(t, SampleConfigMap)
+	httprouteconfigContentExpected := readAPIRelatedFiles(t, SampleHttpRouteConfigWithDefaultSwagger)
+	configmapContentExpected := readAPIRelatedFiles(t, SampleConfigMapWithDefaultSwagger)
 
 	assert.Equal(t, httprouteconfigContent, httprouteconfigContentExpected)
 	assert.Equal(t, configmapContent, configmapContentExpected)
@@ -187,9 +194,9 @@ func createAPIWithSwagger(t *testing.T, apiName, apiversion, swagger string) (st
 // Creates API from the Backend Service URL
 func createAPIWithBackendServiceURL(t *testing.T, apiName, apiversion, backendURL string) (string, error) {
 	output, err := base.Execute(t, "create", "api", apiName, "--service-url", backendURL, "--dry-run", "--verbose")
-	t.Cleanup(func() {
-		removeAPI(t, apiName, apiversion)
-	})
+	// t.Cleanup(func() {
+	// 	removeAPI(t, apiName, apiversion)
+	// })
 	return output, err
 }
 
@@ -218,7 +225,8 @@ func removeFile(t *testing.T, filename string) {
 }
 
 func readAPIRelatedFiles(t *testing.T, filename string) map[string]interface{} {
-	content, err := ioutil.ReadFile(filename)
+
+	content, err := ioutil.ReadFile(filepath.Join(base.RelativeBinaryPath, filename))
 
 	if err != nil {
 		t.Fatal(err)

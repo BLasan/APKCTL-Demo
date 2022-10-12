@@ -1,9 +1,12 @@
 package base
 
 import (
+	"bytes"
+	"io"
 	"math/rand"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -22,7 +25,8 @@ func GenerateRandomName(n int) string {
 // Execute : Run apictl command
 //
 func Execute(t *testing.T, args ...string) (string, error) {
-	cmd := exec.Command(RelativeBinaryPath+BinaryName, args...)
+	path := filepath.Join(RelativeBinaryPath, BinaryName)
+	cmd := exec.Command(path, args...)
 
 	t.Log("base.Execute() - apkctl command:", cmd.String())
 	// run command
@@ -35,21 +39,34 @@ func Execute(t *testing.T, args ...string) (string, error) {
 func ExecuteKubernetesCommands(args ...string) (string, error) {
 	cmd := exec.Command(K8sBinaryName, args...)
 
-	// run command
-	output, err := cmd.Output()
+	// // run command
+	// output, err := cmd.Output()
 
+	var errBuf bytes.Buffer
+	cmd.Stderr = io.MultiWriter(os.Stderr, &errBuf)
+
+	output, err := cmd.Output()
 	return string(output), err
+
+	// return string(output), err
 }
 
+// func GetExportedPathFromOutput(output string) string {
+// 	//Check directory path to omit changes due to OS differences
+// 	if strings.Contains(output, ":\\") {
+// 		arrayOutput := []rune(output)
+// 		extractedPath := string(arrayOutput[strings.Index(output, ":\\")-1:])
+// 		return strings.ReplaceAll(strings.ReplaceAll(extractedPath, "\n", ""), " ", "")
+// 	} else {
+// 		return strings.ReplaceAll(strings.ReplaceAll(output[strings.Index(output, string(os.PathSeparator)):], "\n", ""), " ", "")
+// 	}
+// }
+
 func GetExportedPathFromOutput(output string) string {
-	//Check directory path to omit changes due to OS differences
-	if strings.Contains(output, ":\\") {
-		arrayOutput := []rune(output)
-		extractedPath := string(arrayOutput[strings.Index(output, ":\\")-1:])
-		return strings.ReplaceAll(strings.ReplaceAll(extractedPath, "\n", ""), " ", "")
-	} else {
-		return strings.ReplaceAll(strings.ReplaceAll(output[strings.Index(output, string(os.PathSeparator)):], "\n", ""), " ", "")
-	}
+	out := strings.ReplaceAll(output, " ", "")
+	arrayOutput := []rune(out)
+	extractedPath := string(arrayOutput[strings.Index(out, ":")+1:])
+	return strings.ReplaceAll(strings.ReplaceAll(extractedPath, "\n", ""), " ", "")
 }
 
 // IsFileAvailable checks if a file exists and is not a directory before we
