@@ -38,13 +38,14 @@ func InstallPlatform(profile, namespace string, helmVersion int) {
 		utils.HandleErrorAndExit("Please use Helm version 3 as version 2 is not supported yet", nil)
 	}
 
+	// Get default namespace if namespace is not speicified
+	if namespace == "" {
+		namespace = utils.GetNamespace()
+	}
+
 	// If profile is not specified using the --profile flag, install all K8s components
 	// (i.e. Components of Control Plane and Data Plane)
 	if profile == "" {
-		// Install components in K8s default cluster with default namespace
-		if namespace == "" {
-			namespace = utils.GetNamespace()
-		}
 		fmt.Printf(
 			"Installing APK Platform...\nConnected Cluster Name: %s\nContext: %s\nNamespace: %s\n\n",
 			utils.GetClusterName(),
@@ -52,11 +53,16 @@ func InstallPlatform(profile, namespace string, helmVersion int) {
 			namespace,
 		)
 
-		// Data Plane profile setup
+		// Install Envoy Gateway within the Data Plane profile
+		// NOTE: Need to remove this function when Envoy Gateway is embedded into the helm charts
 		installEnvoyGateway()
 
-		// Control Plane profile setup
-		installCPComponents(namespace)
+		// Execute helm commands to add and install Helm Chart for Data Plane and Control Plane profiles
+		helmArgs := []string{
+			utils.HelmSetFlag,
+			"wso2.apk.cp.ipk.enabled=false", // to disable IPK temporarily
+		}
+		executeHelmCommand(namespace, helmArgs)
 
 	} else if profile == "dp" {
 		// TODO: Re-do when the namespace used by the envoy gateway can be overriden
@@ -68,8 +74,21 @@ func InstallPlatform(profile, namespace string, helmVersion int) {
 			utils.GetNamespace(),
 		)
 
-		// Data Plane profile setup
+		// Install Envoy Gateway within the Data Plane profile
+		// NOTE: Need to remove this function when Envoy Gateway is embedded into the helm charts
 		installEnvoyGateway()
+
+		// Execute helm commands to add and install Helm Chart for Data Plane and Control Plane profiles
+		helmArgs := []string{
+			utils.HelmSetFlag,
+			"wso2.apk.cp.enabled=false",
+			utils.HelmSetFlag,
+			"wso2.apk.cp.postgresql.enabled=false",
+			utils.HelmSetFlag,
+			"wso2.apk.cp.ipk.enabled=false", // to disable IPK temporarily
+		}
+		executeHelmCommand(namespace, helmArgs)
+
 	} else if profile == "cp" {
 		if namespace == "" {
 			namespace = utils.GetNamespace()
@@ -82,7 +101,12 @@ func InstallPlatform(profile, namespace string, helmVersion int) {
 			namespace,
 		)
 
-		installCPComponents(namespace)
+		// Execute helm commands to add and install Helm Chart
+		helmArgs := []string{
+			utils.HelmSetFlag,
+			"wso2.apk.dp.enabled=false",
+		}
+		executeHelmCommand(namespace, helmArgs)
 	}
 	fmt.Println("\nAll Done! We have configured APK to help you build and manage APIs with ease.")
 }
@@ -136,8 +160,9 @@ func installEnvoyGateway() {
 	}
 }
 
-// Function to install and setup Control Plane components
-func installCPComponents(namespace string) {
+// Function to install Helm Chart
+// Function to install and setup Data Plane and/or Control Plane profile with a single helm install command
+func executeHelmCommand(namespace string, helmArgs []string) {
 	// Add bitnami
 	if err := k8sUtils.ExecuteCommand(
 		utils.Helm,
@@ -172,21 +197,20 @@ func installCPComponents(namespace string) {
 		utils.HandleErrorAndExit("Error encountered while executing the Helm dependency build command", err)
 	}
 
-	// Install the APK components
-	if err := k8sUtils.ExecuteCommand(
-		utils.Helm,
+	helmCmd := []string{
 		utils.HelmInstall,
 		utils.APKHelmChartReleaseName,
 		".",
 		utils.HelmNamespaceFlag,
 		namespace,
 		utils.HelmCreateNamespaceFlag,
-		// utils.HelmSetFlag,
-		// "ipk.wso2.subscription.username=<username>",
-		// utils.HelmSetFlag,
-		// "ipk.wso2.subscription.password=<password>",
-		utils.HelmSetFlag,
-		"wso2.apk.cp.ipk.enabled=false", // to disable IPK temporarily
+	}
+	helmCmd = append(helmCmd, helmArgs...)
+
+	// Install the APK components
+	if err := k8sUtils.ExecuteCommand(
+		utils.Helm,
+		helmCmd...
 	); err != nil {
 		utils.HandleErrorAndExit("Error encountered while installing Helm chart", err)
 	}
