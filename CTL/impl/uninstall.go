@@ -29,10 +29,10 @@ func UninstallPlatform() {
 	// Uninstall k8s components that were installed through `apkctl install platform` command
 	fmt.Println("Platform uninstallation initialized...")
 
-	// Uninstall Data Plane profile
+	// Uninstall Envoy Gateway
 	uninstallEnvoyGateway()
 
-	// Uninstall Control Plane profile
+	// Uninstall Helm Chart
 	uninstallCPComponents()
 
 	fmt.Println("\nUninstallation completed!")
@@ -40,33 +40,38 @@ func UninstallPlatform() {
 
 // Handle Envoy Gateway uninstallation
 func uninstallEnvoyGateway() {
+	var err error
 	// Delete the Gateway
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "gateway/eg"); err != nil {
-		utils.HandleErrorAndExit("Error deleting the Gateway", err)
+	if err = k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "gateway/eg"); err != nil {
+		// utils.HandleErrorAndExit("Error deleting the Gateway", err)
 	}
 
 	// Delete the GatewayClass
-	if err := k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "gatewayClass/eg"); err != nil {
-		utils.HandleErrorAndExit("Error deleting the Gateway Class", err)
+	if err = k8sUtils.ExecuteCommand(k8sUtils.Kubectl, k8sUtils.K8sDelete, "gatewayClass/eg"); err != nil {
+		// utils.HandleErrorAndExit("Error deleting the Gateway Class", err)
 	}
 
 	// Uninstall Envoy Gateway
-	if err := k8sUtils.ExecuteCommand(
+	if err = k8sUtils.ExecuteCommand(
 		k8sUtils.Kubectl, k8sUtils.K8sDelete,
 		k8sUtils.FilenameFlag,
 		envoyGatewayInstallYaml,
 	); err != nil {
-		utils.HandleErrorAndExit("Error uninstalling Envoy Gateway", err)
+		// utils.HandleErrorAndExit("Error uninstalling Envoy Gateway", err)
 	}
 
 	// Uninstall Gateway API CRDs
-	if err := k8sUtils.ExecuteCommand(
+	if err = k8sUtils.ExecuteCommand(
 		k8sUtils.Kubectl,
 		k8sUtils.K8sDelete,
 		k8sUtils.FilenameFlag,
 		gatewayAPICRDsYaml,
 	); err != nil {
-		utils.HandleErrorAndExit("Error uninstalling Gateway API CRDs", err)
+		// utils.HandleErrorAndExit("Error uninstalling Gateway API CRDs", err)
+	}
+
+	if err != nil {
+		utils.HandleErrorAndContinue("Error encountered while uninstalling Envoy Gateway", err)
 	}
 }
 
