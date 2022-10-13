@@ -107,3 +107,7 @@ Clean up by executing the following commands once you are done.
 - apkctl delete api \<API Name\> --version \<API Version\> -n \<Namespace\>
 - apkctl get apis -n \<Namespace> -o \<Outptut Format\>
 - apkctl uninstall platform
+
+## Execute Integration tests
+
+Related doc can be found in [here](CTL/integration/README.md)
