@@ -19,6 +19,8 @@
 package cmd
 
 import (
+	"errors"
+
 	"github.com/BLasan/APKCTL-Demo/CTL/impl"
 	"github.com/BLasan/APKCTL-Demo/CTL/utils"
 	"github.com/spf13/cobra"
@@ -44,6 +46,9 @@ var CreateApiCmd = &cobra.Command{
 	Example: createAPICmdExamples,
 	Run: func(cmd *cobra.Command, args []string) {
 		apiName := args[0]
+		if serviceUrl == "" && file == "" {
+			utils.HandleErrorAndExit("Either Swagger Definition or Backend Service URL should be provided", errors.New("backend service URL is mandatory"))
+		}
 		handleCreateApi(apiName)
 	},
 }

@@ -1,7 +1,6 @@
 package testutils
 
 import (
-	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -47,8 +46,6 @@ func CreateNewAPIFromSwaggerWithDryRun(t *testing.T, swagerPath string) {
 	assert.Contains(t, out, "Successfully created API project with HttpRouteConfig and ConfigMap files!")
 
 	apiProjectDir := base.GetExportedPathFromOutput(out)
-
-	fmt.Println("Project Dir: ", apiProjectDir)
 
 	httprouteconfig := filepath.Join(base.RelativeBinaryPath, apiProjectDir, HttpRouteConfigFile)
 
@@ -99,6 +96,33 @@ func CreateNewAPIFromBackendServiceURLWithDryRun(t *testing.T) {
 	// removeFile(t, httprouteconfig)
 	// removeFile(t, configmap)
 
+}
+
+func CreateAPIWithoutBackendService(t *testing.T) {
+	t.Helper()
+	apiName := base.GenerateRandomName(15) + "API"
+	apiVersion := APIVersion
+	_, err := createAPIWithoutBackendService(t, apiName, apiVersion)
+
+	assert.NotNil(t, err, "Either Swagger Definition or Backend Service URL should be provided")
+}
+
+func CreateAPIWithCorruptedSwaggerDefinition(t *testing.T, swaggerpath string) {
+	t.Helper()
+	apiName := base.GenerateRandomName(15) + "API"
+	apiVersion := APIVersion
+	_, err := createAPIWithSwagger(t, apiName, apiVersion, swaggerpath)
+
+	assert.NotNil(t, err, "Swagger Definition is corrupted")
+}
+
+func CreateAPIWithCorruptedBackendServiceURL(t *testing.T) {
+	t.Helper()
+	apiName := base.GenerateRandomName(15) + "API"
+	apiVersion := APIVersion
+	_, err := createAPIWithBackendServiceURL(t, apiName, apiVersion, CorruptedBackendServiceURL)
+
+	assert.NotNil(t, err, "Valid Backend Service URL should be provided")
 }
 
 func ValidateInstallAPKComponents(t *testing.T) {
@@ -197,6 +221,12 @@ func createAPIWithBackendServiceURL(t *testing.T, apiName, apiversion, backendUR
 	// t.Cleanup(func() {
 	// 	removeAPI(t, apiName, apiversion)
 	// })
+	return output, err
+}
+
+// Creates API without providing a swagger or backend service URL
+func createAPIWithoutBackendService(t *testing.T, apiName, apiversion string) (string, error) {
+	output, err := base.Execute(t, "create", "api", apiName, "--dry-run", "--verbose")
 	return output, err
 }
 

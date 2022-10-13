@@ -119,7 +119,7 @@ func removeBackendService() {
 }
 
 func checkK8sClusterAvailability() {
-	args := []string{"get", "cluster"}
+	args := []string{"cluster-info"}
 	out, err := base.ExecuteKubernetesCommands(args...)
 	if err != nil {
 		fmt.Println(out)

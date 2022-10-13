@@ -27,6 +27,25 @@ func TestAPICreationtFromServiceURLWithDryRun(t *testing.T) {
 	})
 }
 
+func TestAPICreationWithoutBackendService(t *testing.T) {
+	t.Run("Create API without providing a backend service", func(t *testing.T) {
+		testutils.CreateAPIWithoutBackendService(t)
+	})
+}
+
+func TestAPICreationWithCorruptedSwagger(t *testing.T) {
+	t.Run("Create API from a corrupted Swagger definition file", func(t *testing.T) {
+		swaggerPath := filepath.Join(base.RelativeTestDirPath, testutils.SampleTestData, testutils.SampleCTestorruptedSwaggerFile)
+		testutils.CreateAPIWithCorruptedSwaggerDefinition(t, swaggerPath)
+	})
+}
+
+func TestAPICreationWithCorruptedServiceURL(t *testing.T) {
+	t.Run("Create API from a corrupted Backend Service URL", func(t *testing.T) {
+		testutils.CreateAPIWithCorruptedBackendServiceURL(t)
+	})
+}
+
 func TestAPIDeploymentFromSwagger(t *testing.T) {
 	t.Run("Deploy API with a Swagger File", func(t *testing.T) {
 		swaggerPath := filepath.Join(base.RelativeTestDirPath, testutils.SampleTestData, testutils.SampleTestSwaggerFile)
