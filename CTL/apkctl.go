@@ -41,6 +41,7 @@ func execute() {
 	if err := RootCmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+	checkVerbose()
 }
 
 func main() {
@@ -54,11 +55,21 @@ func main() {
 	execute()
 }
 
-func init() {
-	cobra.OnInitialize(initConfig)
-}
+// func init() {
 
-func initConfig() {
+// 	// cobra.OnInitialize(initConfig)
+// }
+
+// func initConfig() {
+// 	if verbose {
+// 		fmt.Println("Verbose Enabled")
+// 		utils.EnableVerboseMode()
+// 		t := time.Now()
+// 		utils.Logf("Executed ImportExportCLI (%s) on %v\n", utils.ProjectName, t.Format(time.RFC1123))
+// 	}
+// }
+
+func checkVerbose() {
 	if verbose {
 		utils.EnableVerboseMode()
 		t := time.Now()
