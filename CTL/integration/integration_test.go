@@ -8,7 +8,7 @@ import (
 
 	"github.com/BLasan/APKCTL-Demo/CTL/integration/adminservices"
 	"github.com/BLasan/APKCTL-Demo/CTL/integration/base"
-	testutils "github.com/BLasan/APKCTL-Demo/CTL/integration/testUtils"
+	testutils "github.com/BLasan/APKCTL-Demo/CTL/integration/testutils"
 )
 
 var testCaseUsers = []testutils.TestCaseUsers{

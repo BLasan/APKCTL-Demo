@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/BLasan/APKCTL-Demo/CTL/integration/base"
-	testutils "github.com/BLasan/APKCTL-Demo/CTL/integration/testUtils"
+	testutils "github.com/BLasan/APKCTL-Demo/CTL/integration/testutils"
 )
 
 func TestInstallAPKComponents(t *testing.T) {

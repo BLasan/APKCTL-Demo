@@ -54,7 +54,7 @@ func CreateNewAPIFromSwaggerWithDryRun(t *testing.T, swagerPath string) {
 	assert.True(t, base.IsFileAvailable(t, httprouteconfig), "HttpRouteConfig is not available")
 	assert.True(t, base.IsFileAvailable(t, configmap), "ConfigMap is not available")
 
-	removeAll(t, filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../"))
+	// removeAll(t, filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../"))
 
 	// removeFile(t, httprouteconfig)
 	// removeFile(t, configmap)
@@ -87,11 +87,11 @@ func CreateNewAPIFromBackendServiceURLWithDryRun(t *testing.T) {
 	assert.True(t, base.IsFileAvailable(t, httprouteconfig), "HttpRouteConfig is not available")
 	assert.True(t, base.IsFileAvailable(t, configmap), "ConfigMap is not available")
 
-	absPath := filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../")
+	// absPath := filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../")
 
-	t.Cleanup(func() {
-		removeAll(t, absPath)
-	})
+	// t.Cleanup(func() {
+	// 	removeAll(t, absPath)
+	// })
 
 	// removeFile(t, httprouteconfig)
 	// removeFile(t, configmap)
@@ -163,10 +163,10 @@ func ValidateAPIConfigFiles(t *testing.T) {
 
 	validateAPIRelatedFiles(t, httprouteconfig, configmap)
 
-	t.Cleanup(func() {
-		absPath := filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../")
-		removeAll(t, absPath)
-	})
+	// t.Cleanup(func() {
+	// 	absPath := filepath.Join(base.RelativeBinaryPath, apiProjectDir+"../../../")
+	// 	removeAll(t, absPath)
+	// })
 
 }
 
@@ -234,15 +234,15 @@ func removeAPI(t *testing.T, apiname, version string) {
 	base.Execute(t, "delete", "api", apiname, "--version", version)
 }
 
-func removeAll(t *testing.T, dirname string) {
-	t.Log("testutils.removeAll() - dir path:", dirname)
-	if _, err := os.Stat(dirname); err == nil {
-		err := os.RemoveAll(dirname)
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-}
+// func removeAll(t *testing.T, dirname string) {
+// 	t.Log("testutils.removeAll() - dir path:", dirname)
+// 	if _, err := os.Stat(dirname); err == nil {
+// 		err := os.RemoveAll(dirname)
+// 		if err != nil {
+// 			t.Fatal(err)
+// 		}
+// 	}
+// }
 
 func removeFile(t *testing.T, filename string) {
 	t.Log("testutils.removeFile() - file path:", filename)
