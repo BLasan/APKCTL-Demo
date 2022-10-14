@@ -28,6 +28,8 @@ To get started with APKCTL, you will need to have the prerequisites listed below
 
 - Change directory to `<APKCTL_HOME> (i.e. APKCTL-Demo/CTL)` of cloned repo
 
+- Execute `go mod vendor` or `go mod download` to download all the dependencies
+
 - Run the following command to build the ctl.
 
 ```go build apkctl.go```
