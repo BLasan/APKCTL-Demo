@@ -53,6 +53,9 @@ spec:
               mountPath: /home/wso2/security/truststore/consul
             - name: cc-log-conf-volume
               mountPath: /home/wso2/conf/
+            - mountPath: /home/wso2/check_health.sh
+              name: cc-adapter-grpc-probe-script-conf-volume
+              subPath: "check_health.sh"
           readinessProbe:
             exec:
               command: [ "sh", "check_health.sh" ]
@@ -71,4 +74,8 @@ spec:
         - name: cc-log-conf-volume
           configMap: 
             name: {{ template "apk-helm.resource.prefix" . }}-cc-log-conf
+        - name: cc-adapter-grpc-probe-script-conf-volume
+          configMap: 
+            name: {{ template "apk-helm.resource.prefix" . }}-cc-adapter-grpc-probe-script-conf
+            defaultMode: 0777
 {{- end -}}
