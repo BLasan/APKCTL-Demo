@@ -48,6 +48,7 @@ wso2:
           strategy: Recreate
           replicas: 1
           imagePullPolicy: IfNotPresent
+          # TODO update image 
           image: rakhitharr/apk-devportal:0.1.0
         ingress:
           path: /api/am/devportal
@@ -83,6 +84,7 @@ wso2:
           strategy: Recreate
           replicas: 1
           imagePullPolicy: IfNotPresent
+          # TODO update image 
           image: rakhitharr/apk-admin:0.1.0
         ingress:
           path: /api/am/admin
@@ -118,6 +120,7 @@ wso2:
           strategy: Recreate
           replicas: 1
           imagePullPolicy: IfNotPresent
+          # TODO update image 
           image: rakhitharr/apk-publisher:0.1.0
         ingress:
           path: /api/am/publisher
@@ -153,6 +156,7 @@ wso2:
           strategy: Recreate
           replicas: 1
           imagePullPolicy: IfNotPresent
+          # TODO update image 
           image: lakshithag/apk-sts
         ingress:
           path:  /api/am/sts
@@ -188,6 +192,7 @@ wso2:
           strategy: Recreate
           replicas: 1
           imagePullPolicy: IfNotPresent
+          # TODO update image 
           image: chanaka3d/portals:linux1.0.0
         ingress:
           path:  /
@@ -326,17 +331,6 @@ wso2:
               security:
                 sslHostname: "enforcer"
 
-
-
-
-
-
-
-
-
-
-
-
 postgresql:
   auth:
     postgresPassword: "test1"
@@ -347,9 +341,6 @@ postgresql:
       password: "test1"
   image:
     debug: true
-
-
-
     
 ipk:
   wso2:
